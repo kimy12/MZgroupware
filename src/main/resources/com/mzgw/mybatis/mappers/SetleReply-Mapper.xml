@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="SetleReply-Mapper">
+
+
+	
+
+	<resultMap type="setleReply" id="setleReplyMap">
+		<result property="setleReplyNo" column="SETLE_REPLY_NO"/> 
+		<result property="setleReplyCn" column="SETLE_REPLY_CN"/> 
+		<result property="setleReplyWriter" column="SETLE_REPLY_WRITER"/> 
+		<result property="setleReplyRgdt" column="SETLE_REPLY_RGDT"/> 
+		<result property="setleNo" column="SETLE_NO"/>  
+		<result property="setleReplyWriterNcnm" column="SETLE_REPLY_WRITER_NCNM"/> 
+	</resultMap>
+	
+	<delete id="deleteSetleReplyBySetleReplyNo" parameterType="int">
+		DELETE FROM SETLE_REPLY
+		WHERE SETLE_REPLY_NO = #{setleReplyNo}
+	</delete>
+	
+	<update id="updateSetleReplyBySetleReplyNo" parameterType="setleReply">
+		update SETLE_REPLY
+		SET	SETLE_REPLY_CN = #{setleReplyCn}
+		WHERE SETLE_REPLY_NO = #{setleReplyNo}
+	</update>
+	
+	<update id="insertSetleReply" parameterType="setleReply">
+		Insert into SETLE_REPLY
+		(	SETLE_REPLY_NO,
+			SETLE_REPLY_CN,
+			SETLE_REPLY_WRITER,
+			SETLE_REPLY_RGDT,
+			SETLE_NO,
+			SETLE_REPLY_WRITER_NCNM)  
+		VALUES(
+			#{setleReplyNo},
+			#{setleReplyCn},
+			#{setleReplyWriter},
+			SYSDATE,
+			#{setleNo},
+			#{setleReplyWriterNcnm}
+		)
+		
+	</update>
+	
+	<select id="selectSetleReplyNoSeq" resultType="int">
+		select
+		SETLE_REPLY_NO_SEQ.NEXTVAL
+		FROM DUAL
+	</select>
+	
+	<select id="selectSetleReplyListBySetleNo" parameterType="int" resultMap="setleReplyMap" >
+		select
+		* 
+		from setle_reply
+		where SETLE_NO = #{setleNo}
+		order by SETLE_REPLY_RGDT desc	
+	</select>
+	
+	<select id="selectSetleReplyListCountBySetleNo" parameterType="int" resultType="int" >
+		select
+		count(*)
+		from setle_reply
+		where SETLE_NO = #{setleNo}
+	</select>
+	
+</mapper>

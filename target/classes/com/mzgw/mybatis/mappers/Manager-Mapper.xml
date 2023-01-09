@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Manager-Mapper">
+	
+	<sql id="search">	
+		<if test="searchType == 'd'.toString()">
+			and dept like '%'||#{keyword}||'%'			
+		</if>
+		<if test="searchType == 'p'.toString()">
+			and phone like '%'||#{keyword}||'%'			
+		</if>
+		<if test="searchType == 'r'.toString()">
+			and rank like '%'||#{keyword}||'%'			
+		</if>
+		<if test="searchType == 'n'.toString()">
+			and name like '%'||#{keyword}||'%'			
+		</if>		
+	</sql>
+	
+	<select id="selectEmpList" resultType="emp">
+		SELECT *
+		FROM EMP
+		WHERE ID IS NOT NULL
+		  AND ENABLED = 1
+		  AND ENCPN BETWEEN REPLACE(#{start},'/','-') AND REPLACE(#{end},'/','-')
+		<include refid="search" />
+		ORDER BY encpn DESC
+	</select>
+	
+	<select id="selectEmpListCount" resultType="int" >
+		SELECT COUNT(*)
+		FROM EMP
+		WHERE ID IS NOT NULL
+		<include refid="search" />
+	</select>
+	
+	<select id="selectDeptName" resultType="dept">
+		SELECT *
+		  FROM DEPT
+	</select>
+	
+	<select id="selectWorkTime" resultType="workTime">
+		SELECT *
+		  FROM WORKTIME
+	</select>
+	
+	<select id="selectCompanyTopbar" resultType="topbar">
+		SELECT *
+		  FROM COMPANYTOPBAR
+	</select>
+	
+	<update id="insertEmp" parameterType="emp">
+		INSERT INTO 
+		EMP 
+			(EMPL_NO,ID,PASSWORD,NAME,DEPT,RANK,ENCPN,EMAIL,PHONE,IP,ZIP,BASSADRES,DETAILADRES)
+		VALUES
+			(emp_seq.nextval,#{id},#{password},#{name},#{dept},#{rank},#{encpn},#{email},#{phone},#{ip}
+			,#{zip},#{bassadres},#{detailadres})
+	</update>
+	
+	<update id="updateTopbarColor" parameterType="str">
+		UPDATE COMPANYTOPBAR
+		   SET COLOR = #{color}
+		 WHERE COMPANYNO = 1
+	</update>
+	
+	<update id="updateWorkTime" parameterType="workTime">
+		UPDATE WORKTIME
+		   SET MONDAY = #{monday},
+		       TUESDAY = #{tuesday},
+		       WEDNESDAY = #{wednesday},
+		       THURSDAY = #{thursday},
+		       FRIDAY = #{friday},
+		       SATURDAY = #{saturday},
+		       SUNDAY = #{sunday},
+		       BEGINTIME = #{begintime},
+		       ENDTIME = #{endtime},
+		       CORETIME = #{coretime},
+		       WORKSET = #{workset}
+		 WHERE WNO = 1
+	</update>
+	
+</mapper>

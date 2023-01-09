@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+  <mapper namespace="WorkReply-Mapper">
+  
+  		<select id="selectWReplyListCount" resultType="int">
+  		
+  			select count(*)
+			from job_reply a, emp b
+			where a.empl_no = b.EMPL_NO
+			and a.job_code = #{job_code}
+			order by job_reply_rgdt desc
+  		
+  		</select>
+  		
+  		
+  		<select id="selectWReplyList" resultType="workReply">
+  		
+  			select a.*,
+			b.ncnm,
+			b.dept
+			from job_reply a, emp b
+			where a.empl_no = b.EMPL_NO
+			and a.job_code = #{job_code}
+			order by job_reply_rgdt desc
+  		
+  		</select>
+  		
+	<update id="insertWorkReply" parameterType="workReply">
+		Insert into job_reply
+		(	job_reply_no,
+			job_code,
+			job_reply_cont,
+			job_reply_rgdt,
+			EMPL_NO)
+		VALUES(
+			breply_seq.nextval,
+			#{job_code},
+			#{job_reply_cont},
+			SYSDATE,
+			#{empl_no}
+		)
+		
+	</update>
+	
+	
+  		<update id="updateWorkdReply" parameterType="workReply">
+  		
+  			update job_reply
+  			set
+  			job_reply_cont=#{job_reply_cont}
+  			where job_reply_no = #{job_reply_no}
+  			
+  		</update>
+	
+	
+	<delete id="deleteWorkReply" parameterType="int">
+		DELETE FROM job_reply
+  			where job_reply_no = #{job_reply_no}
+	</delete>
+	
+	
+	
+	
+	
+  </mapper>
+  

@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Push-Mapper">
+
+	<resultMap type="push" id="pushMap">
+		<result column="PUSH_NO" property="pushNo"/>
+		<result column="PUSH_EMP" property="pushEmp"/>
+		<result column="PUSH_RGDATE" property="pushRgdate"/>
+		<result column="PUSH_TYPE" property="pushType"/>
+		<result column="PUSH_CN" property="pushCn"/>
+		<result column="PUSH_URL" property="pushUrl"/>
+		<result column="PUSH_READ" property="pushRead"/>
+	</resultMap>
+	
+
+	
+	
+	<select id="selectUnreadPushByEmplNoAndDate" parameterType="emp" resultMap="pushMap" >
+		select
+		* 
+		from push
+		where PUSH_EMP = #{empl_no}
+		and PUSH_READ = 0
+		and PUSH_RGDATE > #{last_check, jdbcType=DATE}
+		order by PUSH_RGDATE desc 
+	</select>
+	
+	<select id="selectUnreadPushListByEmplNo" parameterType="str" resultMap="pushMap" >
+		select
+		* 
+		from push
+		where PUSH_EMP = #{pushEmp}
+		and PUSH_READ = 0
+		order by PUSH_RGDATE desc 
+	</select>
+	
+	<update id="insertPush" parameterType="push">
+		
+		insert into
+			PUSH
+			(   PUSH_NO, 
+			    PUSH_EMP, 
+			    PUSH_RGDATE, 
+			    PUSH_TYPE, 
+			    PUSH_CN, 
+			    PUSH_URL, 
+				PUSH_READ 
+			) 
+			VALUES(	
+				#{pushNo},
+				#{pushEmp},
+				SYSDATE,
+				#{pushType},
+				#{pushCn},
+				#{pushUrl},
+				0	
+					)
+	
+	</update>
+	
+	
+	<update id="updateRead" parameterType="int">
+		update PUSH
+		SET PUSH_READ = 1
+			
+		where PUSH_NO = #{pushNo}
+	</update>
+	
+	<select id="selectPushNoSeq" resultType="int">
+		select PUSH_NO_SEQ.nextval
+			from dual
+		
+	</select>
+</mapper>

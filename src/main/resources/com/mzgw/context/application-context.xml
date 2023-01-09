@@ -1,0 +1,293 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:c="http://www.springframework.org/schema/c"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+	
+	<bean id="loginUserLogSavePath" class="java.lang.String">
+		<constructor-arg value="${login.user.log}"/>
+	</bean>
+	
+	<bean id="fileUploadPath" class="java.lang.String">
+		<constructor-arg value="${all.upload}"/>
+	</bean>
+	<bean id="boardUploadPath" class="java.lang.String">
+		<constructor-arg value="${board.upload}"/>
+	</bean>
+	<!--  맥북용 테스트 경로 -->
+	<bean id="macboardUploadPath" class="java.lang.String">
+		<constructor-arg value="${macboard.upload}"/>
+	</bean>
+	
+	<bean id="pdsUploadPath" class="java.lang.String">
+		<constructor-arg value="${pds.upload}"/>
+	</bean>
+	
+	<bean id="MailpdsUploadPath" class="java.lang.String">
+		<constructor-arg value="${mail.upload}"/>
+	</bean>
+	
+	<bean id="WorkpdsUploadPath" class="java.lang.String">
+		<constructor-arg value="${work.upload}"/>
+	</bean>
+	
+	<bean id="imgPath" class="java.lang.String">
+		<constructor-arg value="${summernote.img}"/>
+	</bean>
+	
+	<bean id="signImgaPath" class="java.lang.String">
+		<constructor-arg value="${sign.upload}"/>
+	</bean>
+	
+	<bean id="feedUploadPath" class="java.lang.String">
+		<constructor-arg value="${feed.upload}"/>
+	</bean>
+	<bean id="clubBoardUploadPath" class="java.lang.String">
+		<constructor-arg value="${clubboard.upload}"/>
+	</bean>
+	
+	<bean id="userImgPath" class="java.lang.String">
+		<constructor-arg value="${user.upload}"/>
+	</bean>
+	
+	
+	<!-- Repository -->
+	<bean id="empDAO" class="com.mzgw.emp.dao.EmpDAOImpl"
+		p:sqlSession-ref="sqlSession"	
+	/>
+	<bean id="refrnDAO" class="com.mzgw.refrn.dao.RefrnDAOImpl"
+		p:sqlSession-ref="sqlSession"	
+	/>
+	<bean id="managerDAO" class="com.mzgw.manager.dao.ManagerDAOImpl"
+		p:sqlSession-ref="sqlSession"	
+	/>
+	<bean id="pdsPrivateDAO" class="com.mzgw.pds.dao.PdsPrivateDAOImpl"
+		p:sqlSession-ref="sqlSession"	
+	/>
+	
+	<bean id="clubDAO" class="com.mzgw.club.dao.ClubDAOImpl"
+		p:sqlSession-ref="sqlSession"	
+	/>
+
+	<bean id="pdsPublicDAO" class="com.mzgw.pds.dao.PdsPublicDAOImpl"
+		p:sqlSession-ref="sqlSession"	
+	/>
+	
+	<bean id="pdsDepDAO" class="com.mzgw.pds.dao.PdsDepDAOImpl"
+		p:sqlSession-ref="sqlSession"	
+	/>
+	
+	<bean id="pdsFavDAO" class="com.mzgw.pds.dao.PdsFavDAOImpl"
+		p:sqlSession-ref="sqlSession"	
+	/>
+
+	<bean id="mailDAO" class="com.mzgw.mail.dao.MailDAOImpl"
+		p:sqlSession-ref="sqlSession"	
+	/>
+	
+	<bean id="userDAO" class="com.mzgw.user.dao.UserDAOImpl"
+		p:sqlSession-ref="sqlSession"	
+	/>
+	
+	<bean id="dclzDAO" class="com.mzgw.dclz.dao.DclzDAOImpl"
+		p:sqlSession-ref="sqlSession"	
+	/>
+	
+	<bean id="attachDAO" class="com.mzgw.attach.dao.AttachDAOImpl"
+		p:session-ref="sqlSession"
+	/>
+
+	<bean id="boardDAO" class="com.mzgw.board.dao.BoardDAOImpl"
+		p:session-ref="sqlSession"	
+	/>
+	
+	<bean id="customBoardDAO" class="com.mzgw.board.dao.CustomBoardDAOImpl"
+		p:session-ref="sqlSession"
+	/>
+
+	<bean id="departDAO" class="com.mzgw.depart.dao.DepartDAOImpl"
+		p:session-ref="sqlSession"/>
+
+	<bean id="dclzManagerDAO" class="com.mzgw.manager.dao.DclzManagerDAOImpl"
+		p:sqlSession-ref="sqlSession"/>
+		
+	<bean id="clubBoardReplyDAO" class="com.mzgw.club.dao.ClubBoardReplyDAOImpl"
+		p:session-ref="sqlSession"/>
+		
+	
+	<bean id="setleDAO" class="com.mzgw.setle.dao.SetleDAOImpl"
+		p:sqlSession-ref="sqlSession"/>
+	<bean id="setleEmpDAO" class="com.mzgw.setle.dao.SetleEmpDAOImpl"
+		p:sqlSession-ref="sqlSession"/>
+	<bean id="setleFormDAO" class="com.mzgw.setle.dao.SetleFormDAOImpl"
+		p:sqlSession-ref="sqlSession"/>	
+	<bean id="setleReplyDAO" class="com.mzgw.setle.dao.SetleReplyDAOImpl"
+		p:sqlSession-ref="sqlSession"/>		
+	<bean id="setleEvlDAO" class="com.mzgw.setle.dao.SetleEvlDAOImpl"
+		p:sqlSession-ref="sqlSession"/>	
+
+	<bean id="faqDAO" class="com.mzgw.board.dao.FaqDAOImpl"
+		p:session-ref="sqlSession"/>
+
+		
+	<bean id="calDAO" class="com.mzgw.calendar.dao.CalendarDAOImpl"
+		p:session-ref="sqlSession"/>
+
+	<bean id="breplyDAO" class="com.mzgw.board.dao.BReplyDAOImpl"
+		p:session-ref="sqlSession"/>
+		
+	<bean id="boardReplyDAO" class="com.mzgw.board.dao.BoardReplyDAOImpl"
+		p:session-ref="sqlSession"/>
+
+	<bean id="feedDAO" class="com.mzgw.feed.dao.FeedDAOImpl"
+		p:sqlSession-ref="sqlSession"/>
+
+	
+	<bean id="workDAO" class="com.mzgw.work.dao.WorkDAOImpl"
+	   p:sqlSession-ref="sqlSession"	
+	/>
+	
+	<bean id="clubBoardDAO" class="com.mzgw.club.dao.ClubBoardDAOImpl"
+	   p:sqlSession-ref="sqlSession"	
+	/>
+	
+	<bean id="pushDAO" class="com.mzgw.push.dao.PushDAOImpl"
+	   p:sqlSession-ref="sqlSession"
+	/>
+	<bean id="addressDAO" class="com.mzgw.address.dao.AddressDAOImpl"
+		p:session-ref="sqlSession"
+	/>
+	<bean id="workReplyDAO" class="com.mzgw.work.dao.WorkReplyDAOImpl"
+	   p:sqlSession-ref="sqlSession"
+	/>
+	
+	<!-- Service -->
+	<bean id="empService" class="com.mzgw.emp.service.EmpServiceImpl" 
+		p:empDAO-ref="empDAO"
+	/>
+	<bean id="managerService" class="com.mzgw.manager.service.ManagerServiceImpl" 
+		p:managerDAO-ref="managerDAO"
+	/>
+	<bean id="calService" class="com.mzgw.calendar.service.CalendarServiceImpl" 
+		p:calendarDAO-ref="calDAO"
+	/>
+	
+	<bean id="mailService" class="com.mzgw.mail.service.MailServiceImpl" 
+		p:mailDAO-ref="mailDAO"
+		p:attachDAO-ref="attachDAO"
+	/>
+	
+	<bean id="dclzService" class="com.mzgw.dclz.service.DclzServiceImpl" 
+		p:dclzDAO-ref="dclzDAO"
+	/>
+	
+	<bean id="boardService" class="com.mzgw.board.service.BoardServiceImpl" 
+		p:boardDAO-ref="boardDAO"
+		p:attachDAO-ref="attachDAO"
+	/>
+	<bean id="customBoardService" class="com.mzgw.board.service.CustomBoardServiceImpl" 
+		p:customBoardDAO-ref="customBoardDAO"
+		p:attachDAO-ref="attachDAO"
+	/>
+	
+	<bean id="certificationService" class="com.mzgw.emp.service.CertificationService" />
+	
+	<bean id="pdsPrivateService" class="com.mzgw.pds.service.PdsPrivateServiceImpl" 
+		p:pdsPrivateDAO-ref="pdsPrivateDAO"
+		p:attachDAO-ref="attachDAO"
+		p:refrnDAO-ref="refrnDAO"
+		p:pdsFavDAO-ref="pdsFavDAO"
+	/>
+	
+	<bean id="clubService" class="com.mzgw.club.service.ClubServiceImpl" 
+		p:clubDAO-ref="clubDAO"/>
+	
+	<bean id="pdsPublicService" class="com.mzgw.pds.service.PdsPublicServiceImpl" 
+		p:pdsPublicDAO-ref="pdsPublicDAO"
+		p:attachDAO-ref="attachDAO"
+		p:pdsFavDAO-ref="pdsFavDAO"
+	/>
+	
+	<bean id="pdsDepService" class="com.mzgw.pds.service.PdsDepServiceImpl" 
+		p:pdsDepDAO-ref="pdsDepDAO"
+		p:attachDAO-ref="attachDAO"
+		p:pdsFavDAO-ref="pdsFavDAO"
+	/>
+	
+	<bean id="pdsFavService" class="com.mzgw.pds.service.PdsFavServiceImpl" 
+		p:pdsFavDAO-ref="pdsFavDAO"
+	/>
+	
+	<bean id="departService" class="com.mzgw.depart.service.DepartServiceImpl"
+		p:departDAO-ref="departDAO"
+	/>
+	
+	<bean id="dclzManagerService" class="com.mzgw.manager.service.DclzManagerServiceImpl"
+		p:dclzManagerDAO-ref="dclzManagerDAO"
+	/>
+	
+	<bean id="setleService" class="com.mzgw.setle.service.SetleServiceImpl"
+		p:setleDAO-ref="setleDAO"
+		p:attachDAO-ref="attachDAO"
+		p:departDAO-ref="departDAO"
+		p:setleEmpDAO-ref="setleEmpDAO"
+		p:empDAO-ref="empDAO"
+		p:setleFormDAO-ref="setleFormDAO"
+	/>
+	
+	<bean id="setleReplyService" class="com.mzgw.setle.service.SetleReplyServiceImpl"
+		p:setleReplyDAO-ref="setleReplyDAO"/>
+		
+	<bean id="SetleEvlService" class="com.mzgw.setle.service.SetleEvlServiceImpl"
+		p:setleEvlDAO-ref="setleEvlDAO"/>	
+	
+	<bean id="faqService" class="com.mzgw.board.service.FaqServiceImpl"
+		p:faqDAO-ref="faqDAO"/>
+	
+	<bean id="BReplyService" class="com.mzgw.board.service.BReplyServiceImpl"
+		p:breplyDAO-ref="breplyDAO"/>
+		
+	<bean id="BoardReplyService" class="com.mzgw.board.service.BoardReplyServiceImpl"	
+		 p:boardReplyDAO-ref="boardReplyDAO" />
+		 	
+	<bean id="workService" class="com.mzgw.work.service.WorkServiceImpl" 
+		p:workDAO-ref="workDAO"
+		p:attachDAO-ref="attachDAO"
+	/>
+	
+	<bean id="feedService" class="com.mzgw.feed.service.FeedServiceImpl" 
+		p:feedDAO-ref="feedDAO"
+		p:attachDAO-ref="attachDAO"
+	/>
+	
+	<bean id="clubBoardService" class="com.mzgw.club.service.ClubBoardServiceImpl" 
+		p:clubDAO-ref="clubBoardDAO"
+		p:attachDAO-ref="attachDAO"
+	/>
+	
+	<bean id="pushService" class="com.mzgw.push.service.PushServiceImpl" 
+		p:pushDAO-ref="pushDAO"
+		p:departDAO-ref="departDAO"
+		p:empDAO-ref="empDAO"
+		p:setleDAO-ref="setleDAO"
+		p:setleEmpDAO-ref="setleEmpDAO"
+		p:setleFormDAO-ref="setleFormDAO"
+	/>
+	
+	<bean id="addressService" class="com.mzgw.address.service.AddressServiceImpl" 
+		p:addressDAO-ref="addressDAO"
+	/>
+	
+	<bean id="userService" class="com.mzgw.user.service.UserServiceImpl" 
+		p:userDAO-ref="userDAO"
+	/>
+	<bean id="clubBoardReplyService" class="com.mzgw.club.service.ClubBoardReplyServiceImpl"
+		p:clubBoardReplyDAO-ref="clubBoardReplyDAO"
+	/>
+	
+	<bean id="workReplyService" class="com.mzgw.work.service.WorkReplyServiceImpl"
+	    p:workReplyDAO-ref="workReplyDAO"
+	/>	
+	
+</beans>

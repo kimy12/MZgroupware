@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Club-Mapper">
+	
+	<select id="selectClubList" resultType="club">
+		select a.CLUB_NO,
+		       a.CLUB_NM,
+		       a.REGDATE,
+		       a.MIN_PPL,
+		       a.MAX_PPL,
+		       a.PRESIDENT,
+		       a.TARGET,
+		       a.STARTDATE,
+		       a.ENDDATE,
+		       a.MEETINGTIME,
+		       count(b.ncnm) as cntOfCurrentMem
+	     from  club a, club_member b
+	    where a.club_no = b.club_no
+	      and b.state = 'Y'
+	    Group by a.CLUB_NO, a.CLUB_NM, a.REGDATE, a.MIN_PPL, a.MAX_PPL, a.PRESIDENT, a.TARGET,
+		         a.STARTDATE,
+		         a.ENDDATE,
+		         a.MEETINGTIME
+		ORDER BY a.REGDATE DESC
+	</select>
+	
+	<select id="selectClubListAll" resultType="club">
+		select a.CLUB_NO,
+		       a.CLUB_NM,
+		       a.REGDATE,
+		       a.MIN_PPL,
+		       a.MAX_PPL,
+		       a.PRESIDENT,
+		       a.TARGET,
+		       a.STARTDATE,
+		       a.ENDDATE,
+		       a.MEETINGTIME,
+		       a.CLUB_UNITY,
+		       count(b.ncnm) as cntOfCurrentMem
+	     from  club a, club_member b
+	    where a.club_no = b.club_no
+	      and b.state = 'Y'
+	    Group by a.CLUB_NO, a.CLUB_NM, a.REGDATE, a.MIN_PPL, a.MAX_PPL, a.PRESIDENT, a.TARGET,
+		         a.STARTDATE,
+		         a.ENDDATE,
+		          a.CLUB_UNITY, a.MEETINGTIME
+		ORDER BY a.REGDATE DESC
+	</select>
+	
+	<select id="selectClubCount" resultType="int">
+		SELECT COUNT(*) 
+		  FROM CLUB
+	</select>
+	
+	<select id="selectClubByClubNo" parameterType="int" resultType="club">
+		select a.CLUB_NO,
+       a.CLUB_NM,
+       a.REGDATE,
+       a.MIN_PPL,
+       a.MAX_PPL,
+       a.PRESIDENT,
+       a.TARGET,
+		       a.STARTDATE,
+		       a.ENDDATE,
+		       a.MEETINGTIME, a.CLUB_UNITY,
+       count(b.ncnm) as cntOfCurrentMem
+   from	club a, club_member b
+  where a.club_no = b.club_no
+    and b.state = 'Y'
+
+    and a.club_no = #{club_no}
+  Group by a.CLUB_NO, a.CLUB_NM, a.REGDATE, a.MIN_PPL,  a.TARGET,
+		       a.STARTDATE,
+		       a.ENDDATE,
+		        a.CLUB_UNITY, a.MEETINGTIME,a.MAX_PPL, a.PRESIDENT
+	</select>
+	
+	<select id="selectClubMemByClubNo" parameterType="int" resultType="clubmem">
+		select 
+		*
+		from
+		club_member
+		where club_no = #{club_no}
+ 	   and president = 'N'
+	</select>
+	
+	<select id="selectClubConcept" resultType="concept">
+		select 
+		*
+		from
+		club_concept
+	</select>
+	
+	<select id="selectClubConceptByClubno" parameterType="int" resultType="concept">
+		select 
+		*
+		from
+		club_concept
+		where club_no = #{club_no}
+	</select>
+	
+	<select id="cntForMember" resultType="int" parameterType="clubmem">
+		select count(ncnm)
+		from club_member
+		where club_no = #{club_no}
+		and ncnm = #{ncnm}
+		and state = 'N'
+	</select>
+	
+	<!-- <select id="cntForClubMember" resultType="int" parameterType="int">
+		select count(*)
+		from club_member
+		where state = 'Y'
+		and club_no = #{club_no}
+		and president = 'N'
+	</select> -->
+	
+	
+	<update id="insertClubMem" parameterType="clubmem">
+		insert 
+		into
+		club_member(club_no, ncnm, dept, empl_no, birth, gender, hp, memno)
+		values
+		(#{club_no},#{ncnm},#{dept},#{empl_no},#{birth},#{gender},#{hp}, clubmemno_seq.nextval)
+	</update>
+	
+	<select id="clubSeqNextVal" resultType="int">
+		SELECT CLUB_SEQ.NEXTVAL 
+		  FROM DUAL
+	</select>
+	
+	<update id="insertClubPresident" parameterType="emp">
+		INSERT INTO CLUB_MEMBER (
+			   CLUB_NO, 
+			   NCNM, 
+			   DEPT,
+			   STATE,
+			   BIRTH,
+			   GENDER, 
+			   HP, 
+			   PRESIDENT, 
+			   MEMNO, 
+			   EMPL_NO
+		)
+		SELECT #{club_no} AS CLUB_NO, 
+			   NCNM,  
+			   DEPT,
+			   #{state} AS STATE,
+			   BIRTH,
+			   GENDER,
+			   PHONE,
+			   #{pstate} AS PRESIDENT, 
+			   CLUBMEMNO_SEQ.NEXTVAL,
+			   EMPL_NO
+		  FROM EMP
+		 WHERE NCNM = #{ncnm}
+	</update>
+	
+	<update id="insertClubConcept" parameterType="concept">
+		INSERT INTO CLUB_CONCEPT (CLUB_NO, CONTENT)
+		VALUES (#{club_no}, #{content})
+	</update>
+	<update id="deleteClubConcept" parameterType="int">
+		DELETE FROM CLUB_CONCEPT
+		WHERE club_no = #{club_no}
+	</update>
+	
+	<update id="insertClub" parameterType="club">
+		INSERT INTO CLUB(
+			CLUB_NO,
+			CLUB_NM,
+			REGDATE,
+			MIN_PPL,
+			MAX_PPL,
+			PRESIDENT,
+			TARGET,
+			STARTDATE,
+			ENDDATE
+		)
+		VALUES 
+		(
+			#{club_no}, 
+			#{club_nm}, 
+			sysdate, 
+			#{min_ppl}, 
+			#{max_ppl}, 
+			#{president}, 
+			#{target}, 
+			#{startdate}, 
+			#{enddate}
+		)
+	</update>
+	
+	<select id="selectClubNoByNcnm" resultType="clubmem">
+		select * 
+        from club_member
+		where empl_no = #{empl_no}
+        and state = 'Y'
+	</select>
+	
+	<update id="updateStatus" parameterType="clubmem">
+		update 
+		club_member 
+		set 
+		state= 'Y'
+		where memno = #{memno}
+	</update>
+	
+	<update id="deleteMem" parameterType="clubmem">
+		delete 
+		from
+		club_member 
+		where memno = #{memno}
+	</update>
+	
+	<update id="deleteClub" parameterType="int">
+		DELETE 
+		  FROM CLUB
+		 WHERE CLUB_NO = #{club_no}
+	</update>
+	<update id="deleteClubMem" parameterType="int">
+		DELETE 
+		  FROM CLUB_MEMBER
+		 WHERE CLUB_NO = #{club_no}
+	</update>
+	
+	<update id="deleteCludConcept" parameterType="int">
+		DELETE 
+		  FROM CLUB_CONCEPT
+		 WHERE CLUB_NO = #{club_no}
+	</update>
+	
+	<update id="updateClub" parameterType="club">
+		update 
+			club 
+			set 
+				  
+				CLUB_NM   =  #{club_nm},   
+			              
+
+ 				MEETINGTIME = #{meetingtime},
+				TARGET    =  #{target},    
+				STARTDATE =  #{startdate},
+				ENDDATE   =  #{enddate}, 
+				CLUB_UNITY=  #{club_unity} 
+			where
+				CLUB_NO   =  #{club_no}
+	</update>
+
+</mapper>  
+
+

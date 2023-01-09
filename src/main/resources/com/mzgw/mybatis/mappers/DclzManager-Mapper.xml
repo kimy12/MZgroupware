@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+  <mapper namespace="DclzManager-Mapper">
+  
+	<sql id="search">	
+  <choose>
+
+    <when test="searchType != null and !searchType.equals('')">
+        AND dept LIKE #{searchType}
+    </when>
+
+    <otherwise>
+    </otherwise>
+  </choose>	
+	</sql>
+  
+  	
+  
+	<select id="selectEmpListCount" resultType="int" >
+		SELECT COUNT(*)
+		FROM EMP
+		WHERE ID IS NOT NULL
+		<include refid="search" />
+
+	</select>
+    		
+	<select id="selectEmpList" resultType="emp">
+		select *
+		from emp 
+		WHERE ID IS NOT NULL
+  <choose>
+
+    <when test="searchType != null and searchType.equals('전산팀')">
+        AND dept LIKE #{searchType}
+    </when>
+    <when test="searchType != null and searchType.equals('인사팀')">
+        AND dept LIKE #{searchType}
+    </when>
+    <when test="keyword != null and searchType.equals('회계팀')">
+        AND dept LIKE #{searchType}
+    </when>
+        <when test="keyword != null and searchType.equals('영업팀')">
+        AND dept LIKE #{searchType}
+    </when>
+        <when test="keyword != null and searchType.equals('경영기획팀')">
+        AND dept LIKE #{searchType}
+    </when>
+    <otherwise>
+    </otherwise>
+  </choose>
+		order by empl_no asc, encpn desc
+	</select>
+
+	
+	
+	<sql id="joinDept">
+		<if test="searchType == 'd'.toString()">
+			and b.dept like '%'||#{keyword}||'%'			
+		</if>
+		<if test="searchType == 'n'.toString()">
+			and b.name like '%'||#{keyword}||'%'			
+		</if>
+	</sql>
+	
+	<sql id="dclzStatus">	
+		<if test="dclzStatus == 'y'.toString()">
+			and a.progresscode = #{dclzStatus}		
+		</if>
+		<if test="dclzStatus == 'x'.toString()">
+			and a.progresscode = #{dclzStatus}			
+		</if>
+	</sql>
+		
+	<select id="selectDclzMediationList" resultType="dclzMed">
+		SELECT A.*,
+		       B.DEPT,
+		       B.NAME
+		  FROM DCLZMEDITATION A, EMP B
+         WHERE A.EMPL_NO = B.EMPL_NO
+           AND MEDNO IS NOT NULL
+		<include refid="joinDept" />
+		<include refid="dclzStatus" />
+		ORDER BY REQUESTDATE DESC
+	</select>
+	
+	
+	<update id="updateDclzMediation" parameterType="dclzMed">
+		UPDATE DCLZMEDITATION
+           SET COMPLETEDATE = SYSDATE,
+               PROGRESSCODE = #{progresscode}
+         WHERE MEDNO = #{medno}
+	</update>
+	
+	<update id="removeDclzMediation" parameterType="dclzMed">
+		UPDATE DCLZMEDITATION
+           SET COMPLETEDATE = SYSDATE,
+               PROGRESSCODE = #{progresscode},
+               MEDREASON = #{medreason}
+         WHERE MEDNO = #{medno}
+	</update>
+	
+	<update id="updateDclz" parameterType="dclzMed">
+		UPDATE DCLZ
+           SET BEGINTIME = #{reqbegintime},
+               ENDTIME = #{reqendtime}
+         WHERE DCLZSN = #{dclzsn}
+	</update>
+	
+	
+	
+	<select id="selectDclzMediationListCount" resultType="int" >
+		SELECT COUNT(B.NAME)
+		  FROM DCLZMEDITATION A, EMP B
+         WHERE A.EMPL_NO = B.EMPL_NO
+           AND MEDNO IS NOT NULL
+		<include refid="joinDept" />
+		<include refid="dclzStatus" />
+	</select>
+	
+	<select id="selectAnnualList" resultType="annual">
+		SELECT A.*,
+		       B.NAME,
+		       B.DEPT,
+		       B.ENCPN
+		  FROM ANNUAL A, EMP B
+		  WHERE A.EMPL_NO = B.EMPL_NO
+		    AND B.ENCPN BETWEEN #{start} AND #{end}
+		  <include refid="joinDept" />
+		  ORDER BY ANNUNO ASC
+	</select>
+	
+	<select id="selectAnnualListCount" resultType="int">
+		SELECT COUNT(B.NAME)
+		  FROM ANNUAL A, EMP B
+		  WHERE A.EMPL_NO = B.EMPL_NO
+		    AND ANNUNO IS NOT NULL
+		    AND B.ENCPN BETWEEN #{start} AND #{end}
+		    <include refid="joinDept" />
+	</select>
+  	
+  	
+  	
+  	
+	<select id="selectDclzList" resultType="dclz" parameterType="hashmap">
+		SELECT 
+		a.*,
+		e.id
+		FROM
+		dclz a,emp e
+		WHERE
+        a.empl_no = e.empl_no
+		and a.workon between #{beginTime} and #{endTime} 
+
+		order by a.workon
+	</select>
+	
+	
+	<select id="selectTotalWork" resultType="dclz">
+		select distinct c.totalwork,
+		       a.EMPL_NO
+		from dclz a,(select sum(worktime) as totalwork,
+		                    EMPL_NO as EMPL_NO
+		               from dclz 
+		              where workon between #{beginTime} and #{endTime} 
+		              group by empl_no) c
+		where a.EMPL_NO = c.EMPL_NO
+	</select>
+
+  
+	<select id="selectDclzWeekList" resultType="dclzmanager" parameterType="hashmap">
+	
+	 select f.dclzsn as dclzsn ,
+                      f.workon as workon,
+                       f.empl_no as empl_no,
+                        f.begintime as begintime,
+                     f.endtime endtime,
+                     f.worktime as worktime,
+                     f.workstlecode as workstlecode,
+                      f.name as name,
+                      f.dept as dept,
+                        f.rank as rank,
+                    f.encpn as encpn,
+                    g.totalwork as totalwork,
+                    f.id as id
+        from (select a.dclzsn as dclzsn ,
+                      a.workon as workon,
+                       c.empl_no as empl_no,
+                        a.begintime as begintime,
+                     a.endtime as endtime,
+                     a.worktime as worktime,
+                     a.workstlecode as workstlecode,
+                      c.name as name,
+                      c.dept as dept,
+                        c.rank as rank,
+                    c.encpn as encpn,
+                    c.id as id
+                 from dclz a,(select empl_no as empl_no,
+                                      name,
+                                    dept,
+                                    rank,
+                                    encpn,
+                                    id
+                                 from emp ) c
+                                where a.empl_no = c.empl_no
+                                  and  a.workon between #{beginTime} and #{endTime} 
+                                order by c.encpn desc, a.workon asc) f , (select d.encpn as encpn,
+                                                                                 e.totalwork as totalwork,
+                                                                                  d.EMPL_NO as EMPL_NO
+                                                                          from emp d,(select sum(worktime) as totalwork,
+                                                                                                  EMPL_NO as EMPL_NO
+                                                                                       from dclz 
+                                                                                      where workon between #{beginTime} and #{endTime} 
+                                                                                      group by empl_no) e
+                                                                                       where d.EMPL_NO = e.EMPL_NO
+                                                                                      order by d.encpn desc) g 
+ where f.empl_no= g.EMPL_NO
+order by f.empl_no asc, f.encpn desc, f.workon asc       	
+
+</select>
+  
+  
+  
+	<select id="selectWeekListCount" resultType="int" parameterType="hashmap">
+	
+     select count(f.dclzsn)
+        from (select a.dclzsn as dclzsn ,
+                      a.workon as workon,
+                       c.empl_no as empl_no,
+                        a.begintime as begintime,
+                     a.endtime as endtime,
+                     a.worktime as worktime,
+                     a.workstlecode as workstlecode,
+                      c.name as name,
+                      c.dept as dept,
+                        c.rank as rank,
+                    c.encpn as encpn
+                 from dclz a,(select empl_no as empl_no,
+                                      name,
+                                    dept,
+                                    rank,
+                                    encpn
+                                 from emp ) c
+                                where a.empl_no = c.empl_no
+                                  and  a.workon between #{beginTime} and #{endTime} 
+                                order by c.encpn desc, a.workon asc) f , (select d.encpn as encpn,
+                                                                                 e.totalwork as totalwork,
+                                                                                  d.EMPL_NO as EMPL_NO
+                                                                          from emp d,(select sum(worktime) as totalwork,
+                                                                                                  EMPL_NO as EMPL_NO
+                                                                                       from dclz 
+                                                                                      where workon between #{beginTime} and #{endTime} 
+                                                                                      group by empl_no) e
+                                                                                       where d.EMPL_NO = e.EMPL_NO
+                                                                                      order by d.encpn desc) g 
+ where f.empl_no= g.EMPL_NO
+order by f.empl_no asc, f.encpn desc, f.workon asc       	
+
+</select>
+  
+  
+  
+  
+  
+  
+  
+  </mapper>
+  
+  

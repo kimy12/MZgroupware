@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="SetleEvl-Mapper">
+
+
+	
+
+	<resultMap type="setleEvl" id="setleEvlMap">
+		<result column="EVL_NO" property="evlNo"/>	
+		<result column="SETLE_NO" property="setleNo"/>	
+		<result column="EMPL_NO" property="emplNo"/>	
+		<result column="EVL_CN" property="evlCn"/>	
+		<result column="EVL_LV" property="evlLv"/>	
+		<result column="EVL_TY" property="evlTy"/>	
+		<result column="EVL_REGDATE" property="evlRegdate"/>
+		<result column="EMP_NCNM" property="empNcnm"/>
+		<result column="SETLE_NCNM" property="setleNcnm"/>
+	</resultMap>
+	
+	
+	<select id="selectSetleEvlListBySetleNo" parameterType="int" resultMap="setleEvlMap" >
+		select
+		* 
+		from setle_evl
+		where SETLE_NO = #{setleNo}
+		order by EVL_REGDATE desc
+	</select>
+	
+	<select id="selectSetleEvlListCountBySetleNo" parameterType="int" resultType="int" >
+		select
+		count(*) 
+		from setle_evl
+		where SETLE_NO = #{setleNo}
+	</select>
+	
+	
+	<select id="selectSetleEvlByEvlNo" resultMap="setleEvlMap" parameterType="int" >
+		select
+		* 
+		from setle_evl
+		where EVL_NO = #{evlNo}
+	</select>
+	
+	
+	<select id="selectSetleEvlSeq" resultType="int" >
+	SELECT SETLE_EVL_SEQ.NEXTVAL FROM DUAL
+	</select>
+	
+	
+	<update id="insertSetleEvl" parameterType="setleEvl">
+		insert INTO	
+		SETLE_EVL(	EVL_NO, 
+					SETLE_NO, 
+					EMPL_NO,  
+					EVL_CN, 
+					EVL_LV, 
+					EVL_TY, 
+					EMP_NCNM, 
+					EVL_REGDATE,
+					SETLE_NCNM
+					) 
+			VALUES( #{evlNo}, 
+				    #{setleNo}, 
+			        #{emplNo}, 
+			        #{evlCn}, 
+			        #{evlLv},   
+			        #{evlTy},
+			        #{empNcnm}, 
+			        SYSDATE, 
+			        #{setleNcnm}
+			)
+	</update>
+	
+	<update id="updateSetleEvl" parameterType="setleEvl">
+		update SETLE_EVL 
+		set	
+					EVL_CN = #{evlCn}
+			where EVL_NO = #{evlNo}
+	</update>
+	
+	<update id="deleteSetleEvl" parameterType="setleEvl">
+		delete 
+		from SETLE_EVL 
+		where EVL_NO = #{evlNo}
+	</update>
+	
+</mapper>

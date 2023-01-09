@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Fav-Mapper">
+
+	<sql id="search">	
+		<if test="searchType == 's'.toString()">
+			and (ORIGINALNAME like '%'||#{keyword}||'%')
+		</if>
+	</sql>
+	
+	<update id="insertFav" parameterType="fav">
+		insert 
+		into
+		pds_fav(unityatchmnflno, ano, ncnm)
+		values
+		(#{unityatchmnflno},#{ano},#{ncnm})
+		
+	</update>
+	
+	<select id="selectFavListByNcnm" resultType="fav">
+		select * from pds_fav
+		where ncnm = #{ncnm}
+	</select>
+	
+	<update id="deleteFav" parameterType="fav">
+
+		delete
+		from pds_fav
+		where unityatchmnflno=#{unityatchmnflno}
+		and ano=#{ano}
+
+	</update>
+	
+	<select id="selectFavAll" parameterType="hashmap" resultType="attach">
+		select *
+		from attach
+		where unityatchmnflno in (select unityatchmnflno
+		                          from pds_fav
+		                          where ncnm = #{ncnm})
+		and ano in (select ano
+		                          from pds_fav
+		                          where ncnm = #{ncnm})
+		<include refid="search" />
+		order by REGDATE ${nowSort}
+	</select>
+	<select id="selectFavAllCount" parameterType="hashmap" resultType="int">
+		select count(*)
+		from attach
+		where unityatchmnflno in (select unityatchmnflno
+		                          from pds_fav
+		                          where ncnm = #{ncnm})
+		and ano in (select ano
+		                          from pds_fav
+		                          where ncnm = #{ncnm})
+	   <include refid="search" />
+		order by REGDATE ${nowSort}
+	</select>
+	
+</mapper>  
+
+

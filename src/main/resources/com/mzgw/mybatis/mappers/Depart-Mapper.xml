@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Depart-Mapper">
+	
+	<select id="selectDepartList" resultType="dept">
+		SELECT 
+			*
+			FROM DEPT
+	</select>
+	
+	<select id="selectDepartLeaderByDepartName" parameterType="str" resultType="str">
+		SELECT DPRLR_EMPL_NO
+			FROM DEPT
+			WHERE DEPT_NM = #{depatName}		
+	</select>
+	
+</mapper>  
+
+

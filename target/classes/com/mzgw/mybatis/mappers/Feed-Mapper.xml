@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="Feed-Mapper">
+	
+	<resultMap type="feed" id="feedVO">
+		<result column="EMPL_NO" property="empNo"/>
+		<result column="GOOD" property="likeGoob"/>
+		<result column="UNITYATCHMNFLNO" property="unity"/>
+		<result column="STTUS_MSSAGE" property="mssage"/>
+		<result column="PROFILE_IMG" property="profileImg"/>
+		<result column="BACK_IMG" property="backImg"/>
+		<result column="REPLY_NO" property="replyNo"/>
+		<result column="NCNM" property="nicName"/>
+		<result column="NAME" property="feedName"/>
+	</resultMap>
+	
+	<resultMap type="feedReply" id="feedReplyVO">
+		<result column="FEED_REPLYNO" property="replyType"/>
+		<result column="REPLY_NO" property="replyNo"/>
+		<result column="REPLY_EMP" property="replyEmp"/>
+		<result column="REPLY_CONTENT" property="replyText"/>
+		<result column="REPLY_DATE" property="replyDate"/>
+		<result column="NAME" property="replyName"/>
+		<result column="FEED_EMP" property="feedEmp"/>
+	</resultMap>
+	
+
+	<select id="selectFeed" resultMap="feedVO" parameterType="str">
+       SELECT A.*,B.DEPT AS userDept, B.NAME AS replyName, B.NCNM FROM FEED A, EMP B
+		WHERE A.EMPL_NO =  #{empNo}
+           AND A.EMPL_NO = B.EMPL_NO
+	</select>
+	
+	<select id="feedReplyList" resultMap="feedReplyVO" parameterType="int">
+	     SELECT A.*, C.NAME FROM FEED_REPLY A, FEED B, EMP C
+	     WHERE A.FEED_REPLYNO = B.REPLY_NO
+	     AND A.FEED_REPLYNO = #{replyType}
+         AND A.REPLY_EMP = C.EMPL_NO
+         ORDER BY REPLY_DATE DESC
+	</select>
+	
+	<update id="feedReplyInsert" parameterType="feedReply">
+		INSERT INTO FEED_REPLY (FEED_REPLYNO, REPLY_EMP, REPLY_CONTENT, REPLY_DATE,FEED_EMP, REPLY_NO) VALUES(
+			    #{replyType},
+			    #{replyEmp},
+			    #{replyText},
+			    SYSDATE,
+			    #{feedEmp},
+			    #{replyNo}
+			)
+	</update>
+	
+	<update id="feedReplyModify" parameterType="feedReply">
+	    UPDATE FEED_REPLY SET 
+	     REPLY_CONTENT = #{replyText}
+	     WHERE REPLY_NO = #{replyNo}
+	     AND REPLY_EMP =  #{replyEmp}
+	     AND FEED_EMP = #{feedEmp}
+	     AND FEED_REPLYNO = #{replyType}
+	</update>
+	
+	<select id="feedAddressList" resultMap="feedVO">
+		SELECT A.*, B.NCNM, B.NAME FROM FEED A, EMP B
+            WHERE A.EMPL_NO = B.EMPL_NO 
+	</select>
+	
+	<update id="nicNameModify" parameterType="feed">
+       	UPDATE EMP SET 
+	    NCNM = #{nicName}
+	    WHERE EMPL_NO = #{empNo}
+	</update>
+	
+	<select id="empNicNameList" resultType="emp">
+		SELECT NCNM FROM EMP
+	</select>
+	
+	<update id="messageModify" parameterType="feed">
+		UPDATE FEED SET 
+		    STTUS_MSSAGE = #{mssage}
+		    WHERE EMPL_NO = #{empNo}
+	</update>
+	
+	<select id="selectLikeEmp" parameterType="feedLike" resultType="feedLike">
+		SELECT * FROM
+            FEED_LIKE
+          WHERE FEED_EMP = #{feedEmp}
+          AND LIKE_EMP = #{likeEmp}
+	</select>
+	
+	 <update id="insertLike" parameterType="feedLike">
+  	  	INSERT INTO FEED_LIKE
+					(LIKE_NO,
+					FEED_EMP,
+					LIKE_EMP,
+					LIKECHECK
+					)
+			VALUES
+					(
+					FEED_SEQ.NEXTVAL,
+					#{feedEmp},
+					#{likeEmp},
+					#{likeCheck}
+					)
+   </update>
+   
+   <update id="feedLikeup" parameterType="feedLike">
+	  	  UPDATE  FEED
+			SET GOOD = GOOD + 1
+			 WHERE EMPL_NO = #{feedEmp }
+   </update>
+   
+   <delete id="deleteLike" parameterType="feedLike">
+     	DELETE
+   		FROM FEED_LIKE	
+   		WHERE LIKE_EMP = #{likeEmp}
+        AND FEED_EMP = #{feedEmp}
+   </delete>
+
+	<update id="feedLikedown" parameterType="feedLike">
+		 UPDATE  FEED
+			SET GOOD = GOOD - 1
+			 WHERE EMPL_NO = #{feedEmp }
+   </update>
+   
+   <delete id="deleteReply" parameterType="feedLike">
+	    DELETE FROM FEED_REPLY
+	    WHERE FEED_REPLYNO = #{replyType}
+	    AND REPLY_NO = #{replyNo}
+   </delete>
+   
+   <select id="selectFileSeqNext" resultType="int">
+		SELECT unity_seq.nextval as unity FROM dual
+   </select>
+   
+   <select id="feedSeqNext" resultType="int">
+		SELECT feed_seq.nextval as replyNo FROM dual
+   </select>
+   
+   
+   <update id="backgroundImgUpdate" parameterType="feed">
+   		 UPDATE  FEED
+   		 	SET BACK_IMG = #{backImg}
+   		 	WHERE EMPL_NO = #{empNo}
+   </update>
+   
+   <update id="profileImgUpdate" parameterType="feed">
+   		 UPDATE  FEED
+   		 	SET PROFILE_IMG = #{profileImg}
+   		 	WHERE EMPL_NO = #{empNo}
+   </update>
+   
+   <update id="insertFeedContent" parameterType="feed">
+   	 	UPDATE FEED
+   	 	SET UNITYATCHMNFLNO = #{unity}
+   	 	WHERE EMPL_NO = #{empNo}
+   </update>
+	
+
+	<select id="feedContentImgList" parameterType="feed" resultType="attach">
+		SELECT A.* FROM ATTACH A, FEED B
+		WHERE A.UNITYATCHMNFLNO = B.UNITYATCHMNFLNO
+		AND A.UNITYATCHMNFLNO = #{unity}
+		ORDER BY A.ANO DESC
+	</select>
+	
+	<delete id="feedAttachDelete" parameterType="attach">
+		DELETE FROM ATTACH
+		WHERE UNITYATCHMNFLNO = #{unityatchmnflno}
+		AND ANO = #{ano}
+	</delete>
+  
+</mapper>
+

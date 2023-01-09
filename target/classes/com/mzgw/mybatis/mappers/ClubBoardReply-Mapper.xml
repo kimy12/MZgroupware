@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+  <mapper namespace="ClubBoardReply-Mapper">
+  
+  		<select id="selectClubReplyListCount" resultType="int">
+  		
+  			select count(*)
+			from clubreply a, emp b
+			where a.empl_no = b.EMPL_NO
+			and a.clubboard_no = #{clubboard_no}
+			and a.clubboardtype_no = #{clubboardtype_no}
+			order by clubreply_rgdt desc
+  		
+  		</select>
+  		
+  		
+  		<select id="selectclubReplyList" resultType="clubReply">
+  		
+  			select a.*,
+			b.ncnm,
+			b.dept,
+			b.id
+			from clubreply a, emp b
+			where a.empl_no = b.EMPL_NO
+			and a.clubboard_no = #{clubboard_no}
+			and a.clubboardtype_no = #{clubboardtype_no}
+			order by clubreply_rgdt desc
+  		
+  		</select>
+  		
+	<update id="insertClubBoardReply" parameterType="clubReply">
+		Insert into clubreply
+		(	clubreply_no,
+			clubboard_no,
+			clubboardtype_no,
+			clubboard_cont,
+			clubreply_rgdt,
+			empl_no)
+		VALUES(
+			breply_seq.nextval,
+			#{clubboard_no},
+			#{clubboardtype_no},
+			#{clubboard_cont},
+			SYSDATE,
+			#{empl_no}
+		)
+		
+	</update>
+	
+	
+  		<update id="updateClubBoardReply" parameterType="clubReply">
+  		
+  			update clubreply
+  			set
+  			clubboard_cont=#{clubboard_cont},
+  			clubreply_upddt=sysdate
+  			where clubreply_no = #{clubreply_no}
+  			
+  		</update>
+	
+	
+	<delete id="deleteClubBoardReply" parameterType="int">
+		DELETE FROM clubreply
+  			where clubreply_no = #{clubreply_no}
+	</delete>
+	
+	
+	
+	
+	
+  </mapper>
+  

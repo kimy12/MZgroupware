@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Address-Mapper">
+
+	<sql id="search">	
+		<if test="searchType == 'a'.toString()">
+			and ncnm like '%'||#{keyword}||'%'
+		</if>
+		<if test="searchType == 's'.toString()">
+			and rank like '%'||#{keyword}||'%'			
+		</if>
+		<if test="searchType == 'c'.toString()">
+			and dept like '%'||#{keyword}||'%'			
+		</if>
+<!-- 		<if test="searchType == 'y'.toString()">
+			and company like '%'||#{keyword}||'%'			
+		</if> -->
+	</sql>	
+	
+	<!-- <sql id="indexing">	
+		<if test="searchType == 'a'.toString()">
+			and ncnm like '%'||#{keyword}||'%'
+		</if>
+	</sql>	 -->
+	
+	<select id="selectPrivateAddress" parameterType="hashmap" resultType="address">
+		select * 
+		from ADDRESS
+		where LOGINEMPNO = #{empl_no}
+		and ADDRESSTYPE_NO = 2 
+		<include refid="search" />
+	</select>
+	
+	<select id="selectPrivateAddressCount" parameterType="hashmap" resultType="int">
+		select count(*) 
+		from ADDRESS
+		where LOGINEMPNO = #{empl_no}
+		and ADDRESSTYPE_NO = 2 
+		<include refid="search" />
+	</select>
+	
+	<update id="insertPrivateAddress" parameterType="address">
+		insert
+		into
+		address(name,company, rank, dept, hp, email, company_hp, loginempno, address_no)
+		values
+		(#{name},#{company},#{rank},#{dept},#{hp},#{email},#{company_hp}, #{loginempno}, address_seq.nextval)
+	</update>
+	
+	<update id="deleteAddress" parameterType="address">
+		delete
+		from address
+		where name=#{name}
+	</update>
+	
+	<update id="updatePrivateAddress" parameterType="address">
+		update
+		address
+		set
+		name = #{name},
+		company = #{company},
+		rank = #{rank},
+		dept = #{dept},
+		hp = #{hp},
+		email = #{email},
+		company_hp = #{company_hp}
+		where address_no = #{address_no}
+	</update>
+
+</mapper>  
+
+

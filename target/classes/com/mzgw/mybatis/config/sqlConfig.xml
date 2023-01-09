@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE configuration
+  PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+					
+	<typeAliases>
+		<typeAlias type="java.lang.String" alias="str" />
+		<typeAlias type="java.lang.Integer" alias="int" />
+		<typeAlias type="com.mzgw.dto.EmpVO" alias="emp" />
+		<typeAlias type="com.mzgw.dto.PdsPrivateVO" alias="PdsPrivate" />
+		<typeAlias type="com.mzgw.dto.PdsDepVO" alias="PdsDep" />
+		<typeAlias type="com.mzgw.dto.BoardVO" alias="board" />
+		<typeAlias type="com.mzgw.dto.PdsPublicVO" alias="PdsPublic" />
+		<typeAlias type="com.mzgw.dto.BoardTypeVO" alias="boardType" />
+		<typeAlias type="com.mzgw.dto.WorkTimeVO" alias="workTime" />
+		<typeAlias type="com.mzgw.dto.FavVO" alias="fav" />
+		<typeAlias type="com.mzgw.dto.CompanyTopbarVO" alias="topbar" />
+		<typeAlias type="com.mzgw.dto.ClubVO" alias="club" />
+		<typeAlias type="com.mzgw.dto.ClubMemVO" alias="clubmem" />
+		<typeAlias type="com.mzgw.dto.ClubConceptVO" alias="concept" />
+		<typeAlias type="com.mzgw.dto.CalendarVO" alias="calendar" />
+		<typeAlias type="com.mzgw.dto.AnnualVO" alias="annual" />
+		<typeAlias type="com.mzgw.dto.EvlVO" alias="evl" />
+
+		<typeAlias type="com.mzgw.dto.DeptVO" alias="dept" />
+		<typeAlias type="com.mzgw.dto.AttachVO" alias="attach" />
+		<typeAlias type="com.mzgw.dto.RefrnVO" alias="refrn" />
+		
+		<typeAlias type="com.mzgw.dto.MailVO" alias="mail" />
+		<typeAlias type="com.mzgw.dto.ReceVO" alias="rece" />
+		<typeAlias type="com.mzgw.dto.RefeVO" alias="refe" />
+		<typeAlias type="com.mzgw.dto.MailDeleteVO" alias="deMail" />
+		
+		<typeAlias type="com.mzgw.dto.DclzVO" alias="dclz" />
+		<typeAlias type="com.mzgw.dto.DclzMeditationVO" alias="dclzMed" />
+		<typeAlias type="com.mzgw.dto.DclzManagerVO" alias="dclzManager" />
+
+		<typeAlias type="com.mzgw.dto.SetleVO" alias="setle" />
+		<typeAlias type="com.mzgw.dto.SetleFormVO" alias="setleForm" />
+		<typeAlias type="com.mzgw.dto.SetleEmpVO" alias="setleEmp" />
+		<typeAlias type="com.mzgw.dto.SetleReplyVO" alias="setleReply" />
+		<typeAlias type="com.mzgw.dto.SetleEvlVO" alias="setleEvl" />
+		
+		
+		<typeAlias type="com.mzgw.dto.FaqVO" alias="faq"/>
+		<typeAlias type="com.mzgw.dto.BReplyVO" alias="breply"/>
+		<typeAlias type="com.mzgw.dto.PushVO" alias="push" />
+		<typeAlias type="com.mzgw.dto.WorkVO" alias="work" />
+		<typeAlias type="com.mzgw.dto.WorkMemVO" alias="workMem" />
+		<typeAlias type="com.mzgw.dto.LikeToVO" alias="likeTo" />
+		<typeAlias type="com.mzgw.dto.ClubLikeToVO" alias="clublikeTo" />
+		
+		<typeAlias type="com.mzgw.dto.FeedVO" alias="feed" />
+		<typeAlias type="com.mzgw.dto.FeedReplyVO" alias="feedReply" />
+		<typeAlias type="com.mzgw.dto.FeedLikeVO" alias="feedLike" />
+		<typeAlias type="com.mzgw.dto.ClubBoardVO" alias="clubBoard" />
+		<typeAlias type="com.mzgw.dto.ClubBoardReplyVO" alias="clubReply" />
+		<typeAlias type="com.mzgw.dto.WorkReplyVO" alias="workReply" />
+		
+		<typeAlias type="com.mzgw.dto.AddressVO" alias="address"/>
+		<typeAlias type="com.mzgw.dto.PopupVO" alias="pop"/>
+
+		
+	</typeAliases>
+	
+</configuration>
+
+

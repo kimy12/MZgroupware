@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+  
+<mapper namespace="Work-Mapper">
+	<resultMap type="work" id="WorkVO">
+		<result column="JOB_CODE" property="jobCode" />
+		<result column="JOB_NM" property="jobNm" />
+		<result column="JOB_CN" property="jobCn" />
+		<result column="JOB_BGNDE" property="jobBgnde" />
+		<result column="JOB_ENDDE" property="jobEndde" />
+		<result column="JOB_UPDDE" property="jobUpdde" />
+		<result column="JOB_STTUS" property="jobSttus" />
+		<result column="UNITYATCHMNFLNO" property="unitNo" />
+		<result column="JOB_WRITER" property="jobWriter" />
+		<result column="JOB_DEPT" property="jobDept" />
+		<result column="ID" property="empId" />
+		<result column="NAME" property="empName" />
+		<result column="DEPT" property="empDept" />
+		<result column="NCNM" property="empNcnm" />
+		<result column="RANK" property="empRank" />
+		<result column="JOB_REDDE" property="jobRedde" />
+		<result column="UP_EMP" property="upEmp" />
+		<result column="UP_EMPNAME" property="upEmp" />
+	</resultMap>
+	
+	<resultMap type="workMem" id="WorkMemVO">
+		<result column="JOB_NO" property="jobCode" />
+		<result column="EMPL_NO" property="jobMemCode" />
+		<result column="ID" property="empId" />
+		<result column="NAME" property="empName" />
+		<result column="DEPT" property="empDept" />
+		<result column="RANK" property="empRank" />
+	</resultMap>
+	
+	<sql id="search">
+		<if test="searchType == 'a'.toString()">
+			and ((A.JOB_NM like '%'||#{keyword}||'%')
+				or(A.JOB_CN like '%'||#{keyword}||'%'))		
+		</if>
+	
+		<if test="searchType == 'JNM'.toString()">
+			and A.JOB_NM like '%'||#{keyword}||'%'			
+		</if>
+		
+		<if test="searchType == 'JBD'.toString()">
+			and A.JOB_BGNDE like '%'||#{keyword}||'%'			
+		</if>
+		
+		<if test="searchType == 'JED'.toString()">
+			and A.JOB_ENDDE like '%'||#{keyword}||'%'			
+		</if>
+		
+		<if test="searchType == 'JWRI'.toString()">
+			and A.JOB_WRITER like '%'||#{keyword}||'%'			
+		</if>
+	</sql>
+
+	<select id="selectWorkFileSeqNext" resultType="int">
+		SELECT unity_seq.nextval as unityNo FROM dual
+	</select>
+	
+	<select id="selectWorkJno" resultType="int">
+		SELECT job_seq.nextval as jobCode FROM dual
+	</select>
+	
+	<update id="insertWork" parameterType="work">
+		INSERT INTO JOB VALUES(
+			#{jobCode},
+			#{jobNm},
+			#{jobCn},
+			#{jobBgnde},
+			#{jobEndde},
+			sysdate,
+			#{jobSttus},
+			#{unitNo},
+			#{jobWriter},
+			#{jobDept},
+			sysdate,
+			#{upEmp}
+		)
+	</update>
+	
+
+	<update id="workMember" parameterType="workMem">
+		INSERT INTO JOB_EMP VALUES(
+			#{jobCode},
+			#{jobMemCode}
+		)	
+	</update>
+	
+	<select id="selectCommonList" resultMap="WorkVO">
+		SELECT A.*, B.NAME, B.DEPT, B.RANK, B.NCNM, B.ID FROM JOB A, EMP B
+    		WHERE A.JOB_WRITER = B.EMPL_NO
+    		<include refid="search" />
+    		ORDER BY A.JOB_CODE DESC
+	</select>
+	
+	<select id="selectIndivList" resultMap="WorkVO" parameterType="hashmap">
+		SELECT A.*,C.NAME, C.DEPT, C.RANK, C.NCNM, C.ID FROM JOB A, JOB_EMP B, EMP C
+			WHERE B.EMPL_NO = #{empl_no}
+			AND A.JOB_CODE = B.JOB_NO
+			AND A.JOB_WRITER = C.EMPL_NO
+			<include refid="search" />
+			ORDER BY A.JOB_CODE ${nowSort}
+	</select>
+	
+	<select id="assignMemList" resultMap="WorkMemVO">
+		SELECT A.*, B.NAME, B.DEPT, B.RANK, B.ID FROM JOB_EMP A, EMP B
+		WHERE A.EMPL_NO = B.EMPL_NO
+	</select>
+	
+	<select id="selectDetailWno" parameterType="int" resultMap="WorkVO">
+		  SELECT A.*, B.NAME, B.DEPT, B.RANK, B.ID FROM JOB A, EMP B
+    		WHERE A.JOB_WRITER = B.EMPL_NO
+            AND A.JOB_CODE = #{jobCode}
+	</select>
+	
+	<select id="workAttachList" resultType="attach">
+		 SELECT A.*
+			FROM ATTACH A, JOB B
+				WHERE A.UNITYATCHMNFLNO = B.UNITYATCHMNFLNO  
+	</select>
+	
+	<update id="workModify" parameterType="work">
+		UPDATE JOB SET
+			JOB_NM = #{jobNm},
+			JOB_CN = #{jobCn},
+			JOB_BGNDE = #{jobBgnde},
+			JOB_ENDDE = #{jobEndde},
+			JOB_STTUS = #{jobSttus},
+			UNITYATCHMNFLNO = #{unitNo},
+			JOB_DEPT = #{jobDept},
+			JOB_REDDE = SYSDATE,
+			UP_EMP = #{upEmp}
+			WHERE JOB_CODE = ${jobCode}
+	</update>
+	
+	<delete id="assMemDelete">
+		DELETE FROM JOB_EMP
+			WHERE JOB_NO = #{jobCode}
+			AND EMPL_NO = #{jobMemCode}
+	</delete>
+	
+	<select id="selectWorkTotalCount" resultType="int">
+		SELECT COUNT(*) FROM JOB
+	</select>
+
+
+	<delete id="deleteWork" parameterType="int">
+		DELETE FROM JOB
+		WHERE JOB_CODE = #{jobCode}
+	</delete>
+	
+	
+	<delete id="deleteJobEmp" parameterType="int">
+		DELETE FROM JOB_EMP
+		WHERE JOB_NO = #{jobCode}
+	</delete>
+	
+	<select id="selectJobBySttus" resultMap="WorkVO" parameterType="hashmap">
+		SELECT A.*,C.NAME, C.DEPT, C.RANK, C.NCNM, C.ID FROM JOB A, JOB_EMP B, EMP C
+			WHERE B.EMPL_NO = #{empl_no}
+			AND A.JOB_CODE = B.JOB_NO
+			AND A.JOB_WRITER = C.EMPL_NO
+			AND A.JOB_STTUS = #{jobSttus}
+		ORDER BY JOB_REDDE DESC
+	</select>
+	
+	<select id="selectJobCountBySttus" resultType="hashmap">
+		SELECT count(*)
+		FROM JOB
+		WHERE JOB_STTUS = #{jobSttus}
+	</select>
+	
+</mapper>

@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Emp-Mapper">
+	
+	<sql id="search">	
+		<if test="searchType == 'a'.toString()">
+			where ncnm like '%'||#{keyword}||'%'
+		</if>
+		<if test="searchType == 's'.toString()">
+			where rank like '%'||#{keyword}||'%'			
+		</if>
+		<if test="searchType == 'c'.toString()">
+			where dept like '%'||#{keyword}||'%'			
+		</if>
+	</sql>	
+	
+	<select id="selectEmp" parameterType="str" resultType="emp">
+		SELECT *
+		  FROM EMP
+		 WHERE ID=#{id}
+	</select>
+	
+	<select id="addressIndexing" parameterType="hashmap" resultType="emp">
+		select *
+		from emp
+		<![CDATA[ where name >= #{firstLetter}
+		and name < #{lastLetter} ]]>
+	</select>
+	
+	<select id="addressIndexingCount" parameterType="hashmap" resultType="int">
+		select count(*)
+		from emp
+		<![CDATA[ where name >= #{firstLetter}
+		and name < #{lastLetter} ]]>
+	</select>
+	
+	<select id="selectId" parameterType="emp" resultType="str">
+		SELECT ID 
+		  FROM EMP 
+		 WHERE NAME=#{name} 
+		   AND EMAIL=#{email}
+	</select>
+	
+	<select id="checkId" parameterType="str" resultType="str">
+		SELECT ID 
+		  FROM EMP 
+		 WHERE ID=#{id} 
+	</select>
+	
+	<select id="selectPhone" parameterType="emp" resultType="str">
+		SELECT PHONE 
+		  FROM EMP 
+		 WHERE ID=#{id}
+		   AND PHONE=#{phone} 
+	</select>
+	
+	<select id="selectPwd" parameterType="str" resultType="str">
+		SELECT PASSWORD 
+		  FROM EMP 
+		 WHERE ID=#{id} 
+	</select>
+	
+
+	<update id="updateNewEmp" parameterType="emp">
+		UPDATE EMP
+		   SET ID = #{id},
+			   PASSWORD = #{password},
+			   NCNM = #{ncnm},
+			   ENABLED = 1
+		 WHERE ID=#{chkId}
+
+	</update>
+
+	<select id="selectEmpList" resultType="emp">
+		SELECT *
+		  FROM EMP
+	</select>
+	
+	<select id="selectEmpListForAddress" parameterType="hashmap"  resultType="emp">
+		SELECT empl_no, name, ncnm, rank, dept, phone, email
+
+		  FROM EMP
+		  <include refid="search" />
+	</select>
+	
+	<select id="selectEmpListForAddressCount" parameterType="hashmap"  resultType="int">
+		SELECT count(*)
+
+		  FROM EMP
+		  <include refid="search" />
+	</select>
+	
+	<select id="selectEmpListByDept" parameterType="str" resultType="emp">
+		SELECT *
+		  FROM EMP
+		  WHERE DEPT = #{dept}
+	</select>
+	
+	<select id="selectEmpNcnmByDept" parameterType="str" resultType="str">
+		SELECT NCNM
+		 FROM EMP
+		 WHERE DEPT = #{dept}
+	</select>
+	
+	<select id="selectEmpByEmplNo" parameterType="str" resultType="emp">
+		SELECT *
+		  FROM EMP
+		  WHERE EMPL_NO = #{empl_no}
+	</select>
+
+	<update id="updateLastCheck" parameterType="str">
+		UPDATE EMP
+		   SET LAST_CHECK = SYSDATE
+		 WHERE ID=#{id}
+	</update>
+
+	<update id="myImgUpdate" parameterType="emp">
+		UPDATE EMP
+			SET PHOTO = #{photo}
+		 WHERE EMPL_NO = #{empl_no}
+	</update>
+	
+	<update id="myInfoUpdate" parameterType="emp">
+		UPDATE EMP
+			SET NAME = #{name},
+				BIRTH = #{birth},
+				GENDER = #{gender},
+				BASSADRES = #{bassadres},
+				DETAILADRES = #{detailadres},
+				PHONE = #{phone},
+				EMAIL = #{email},
+				IP = #{ip}
+		 WHERE EMPL_NO = #{empl_no}
+	</update>
+	
+	<update id="passwordUpdate" parameterType="emp">
+		UPDATE EMP
+			SET PASSWORD = #{password}
+		WHERE EMPL_NO = #{empl_no}
+	</update>
+	
+	<update id="updateAddress" parameterType="emp">
+		insert into address (empl_no,ncnm, rank, dept, hp, email,name, address_no,loginempno)
+			select empl_no,ncnm, rank, dept, phone, email,name, address_seq.nextval,#{loginempno} as loginempno
+			from emp
+			where empl_no = #{empl_no}
+	</update>
+	
+	
+</mapper>

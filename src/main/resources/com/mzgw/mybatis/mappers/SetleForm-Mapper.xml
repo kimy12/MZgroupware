@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="SetleForm-Mapper">
+
+
+	
+
+	<resultMap type="setleForm" id="setleFormMap">
+		<result property="setleFormNo" column="SETLE_FORM_NO"/>
+		<result property="formNm" column="FORM_NM"/>
+		<result property="formCn" column="FORM_CN"/>
+		<result property="formFile" column="FORM_FILE"/>	
+	</resultMap>
+	
+	
+	<select id="selectSetleFormBySetleFormNo" parameterType="int" resultMap="setleFormMap" >
+		select
+		* 
+		from setle_form
+		where SETLE_FORM_NO = #{setleFormNo}
+	</select>
+	
+	<select id="selectSetleFormList" resultMap="setleFormMap" >
+		select *
+	    from setle_form
+	    
+	    where setle_form_no != -1
+	    order by form_nm
+	</select>
+	<select id="selectSetleFormSeq" resultType="int" >
+	SELECT SETLE_FORM_SEQ.NEXTVAL FROM DUAL
+	</select>
+	<update id="insertSetleForm" parameterType="setleForm">
+		insert INTO	
+		SETLE_FORM(	SETLE_FORM_NO, 
+					FORM_NM, 
+					FORM_CN, 
+					FORM_FILE) 
+			VALUES( #{setleFormNo}, 
+					#{formNm}, 
+			        #{formCn}, 
+			        #{formFile}
+			)
+	</update>
+	
+</mapper>

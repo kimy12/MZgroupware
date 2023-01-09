@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+  <mapper namespace="Faq-Mapper">
+  	<!-- value값이 null이면 전체조회 value값이 있으면 해당 value값 데이터 조회 -->
+  	<select id="selectAllFaqList" resultType="faq">
+  		
+  		SELECT *
+  		FROM FAQ
+  		<if test="value>0">
+  		where faq_type=#{value}
+  		</if>
+     	
+     	
+  	</select>
+  
+ <!--  <select id="selectFaqListByType" parameterType="str">
+  		
+  		SELECT * 
+  		FROM FAQ
+  		where faq_type=#{faq_type}
+  	
+  	</select> -->
+  	
+  	<update id="insertFaq" parameterType="faq">
+  	
+  		insert
+  		into 
+  		faq(faq_type,faq_no,faq_writer,faq_que,faq_ans)
+  		values(#{faq_type},faq_seq.nextval,#{faq_writer},#{faq_que},#{faq_ans})
+  	
+  	</update>
+  	
+  	<update id="updateFaq" parameterType="faq">
+  	
+  		update faq
+  		set
+  		faq_que=#{faq_que},faq_ans=#{faq_ans}
+  		where faq_no=#{faq_no}
+  	
+  	</update>
+  
+  <update id="deleteFaq" parameterType="int">
+  	
+  	delete
+  	from faq
+  	where faq_no=#{faq_no}
+  	
+  
+  </update>
+  
+  
+  </mapper>

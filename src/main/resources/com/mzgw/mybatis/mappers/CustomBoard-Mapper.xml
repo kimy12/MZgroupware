@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+  <mapper namespace="CustomBoard-Mapper">
+  
+<sql id="search">	
+		<if test="searchType == 'a'.toString()">
+			and ((a.board_title like '%'||#{keyword}||'%')
+				or(a.board_cont like '%'||#{keyword}||'%'))		
+		</if>
+		<if test="searchType == 't'.toString()">
+			and a.board_title like '%'||#{keyword}||'%'			
+		</if>
+		<if test="searchType == 'c'.toString()">
+			and a.board_cont like '%'||#{keyword}||'%'			
+		</if>	
+		<if test="searchType == 'w'.toString()">
+			and b.ncnm like '%'||#{keyword}||'%'		
+		</if>
+	</sql>
+  
+  	  
+  	  <select id="selectBoardMenu" resultType="boardType">
+  	  	SELECT * 
+  	  	  FROM BOARDTYPE
+  	  	 WHERE MAKER IS NOT NULL
+  	  </select>
+  	  
+  	  <select id="selectBoardDetail" parameterType="int" resultType="boardType">
+  	  	SELECT BOARDTYPE_NO,
+			   OPENED,
+			   BOARDNAME,
+			   REGDATE,
+		       MAKER
+  	  	  FROM BOARDTYPE 
+  	  	 WHERE BOARDTYPE_NO = #{boardtype_no}
+  	  </select>
+  	  
+  	  <select id="selectCustomBoard" parameterType="int" resultType="boardType">
+  	  	SELECT BOARDNAME 
+  	  	  FROM BOARDTYPE 
+  	  	 WHERE BOARDTYPE_NO = #{boardtype_no}
+  	  </select>
+  	  
+  	  <select id="selectCustomBoardList" parameterType="int" resultType="boardType">
+  	  	SELECT * 
+  	  	  FROM BOARD 
+  	  	 WHERE BOARDTYPE_NO = #{boardtype_no}
+  	  </select>
+  	  
+  	  <update id="insertBoard" parameterType="boardType">
+  	  	INSERT INTO BOARDTYPE 
+  	  	VALUES(BBSCL_SEQ.NEXTVAL,#{opened},#{boardName},SYSDATE,#{maker})
+  	  </update>
+  	  
+  	  <update id="updateBoard" parameterType="boardType">
+		UPDATE BOARDTYPE
+		   SET BOARDNAME = #{boardName},
+			   OPENED = #{opened}
+		 WHERE BOARDTYPE_NO=#{boardtype_no}
+	  </update>
+	  
+  	  <update id="deleteBoard" parameterType="int">
+		DELETE 
+		  FROM BOARDTYPE 
+		 WHERE BOARDTYPE_NO = #{boardtype_no}
+	  </update>
+
+  	  <select id="selectBoardListByBtno"  parameterType="hashmap" resultType="board">
+		SELECT
+		    a.*,
+		    (
+		        SELECT
+		            COUNT(*)
+		        FROM
+		            breply c
+		        WHERE
+		            a.board_no = c.board_no
+		    ) AS breply_count,
+		    b.dept,
+		    b.ncnm
+		FROM
+		    board a,
+		    emp b
+		WHERE
+		    a.board_writer = b.empl_no
+		    AND a.boardtype_no = #{boardtype_no}
+		    <include refid="search" />
+       ORDER BY BOARD_RGDT ${nowSort}
+  	  </select>
+
+
+  	  <select id="selectBoardListCount"  parameterType="hashmap" resultType="int">
+		select 
+		count(*) 
+		from board a, emp b
+		where a.board_writer = b.EMPL_NO
+		and a.boardtype_no = #{boardtype_no}
+				
+		order by board_rgdt ${nowSort}
+
+  	  </select>
+
+
+
+
+
+	<select id="selectBoardSeqNext" resultType="int">
+		SELECT unity_seq.nextval as unityNo FROM dual
+	</select>
+
+	<update id="insertCustomBoard" parameterType="board">
+
+		insert
+		into
+		board(boardtype_no,board_no,board_title,board_writer,board_cont,board_rgdt,unityatchmnflno)
+		values(#{boardtype_no},board_seq.nextval,#{board_title},#{board_writer},#{board_cont},sysdate,#{unityatchmnflno})
+
+	</update>
+	
+		<update id="increaseViewCnt" parameterType="board">
+
+		update board
+		set board_cnt=board_cnt+1
+		where boardtype_no=#{boardtype_no}
+		and board_no=#{board_no}
+
+	</update>
+
+	
+	<select id="selectBoardByBno"  resultType="board">
+      select a.*,
+      		b.dept,
+      		b.ncnm 
+		from board a, emp b 
+		where a.board_writer=b.empl_no
+		and board_no=#{board_no}
+        and boardtype_no=#{boardtype_no}
+	</select>
+	
+	<update id="updateCustomBoard" parameterType="board">
+		update 
+		board 
+		set 
+		board_title=#{board_title}, board_cont=#{board_cont}
+		where board_no=#{board_no}
+		and boardtype_no=#{boardtype_no}
+	</update>
+	
+	<update id="deleteCustomBoard" parameterType="board">
+
+		delete
+		from board
+		where board_no=#{board_no}
+		and boardtype_no=#{boardtype_no}
+	</update>
+
+	<select id="selectEmpByBno"  parameterType="board" resultType="emp">
+	
+             select a.dept as dept,
+                    a.name as name
+               from emp a,(select *
+                             from board
+							where board_no=#{board_no}
+						      and boardtype_no=#{boardtype_no})b
+              where a.empl_no = b.board_writer
+	</select>
+	
+	<select id="selectLikeEmp"  parameterType="likeTo" resultType="likeTo">
+			
+			select *
+			from likeTo
+			where board_no =#{board_no }
+			and empl_no=#{empl_no}
+			and boardtype_no=#{boardtype_no}
+
+	
+	</select>
+	
+	
+   <update id="insertLike" parameterType="likeTo">
+  	  	insert into liketo
+					(like_no,
+					board_no,
+					empl_no,
+					likeCheck,
+					boardtype_no)
+			values
+					(
+					LIKE_SEQ.NEXTVAL,
+					#{board_no },
+					#{empl_no},
+					1,
+					#{boardtype_no}
+					)
+   </update>
+	
+	
+	
+	<update id="deleteLike" parameterType="likeTo">
+		DELETE 
+  FROM liketo
+ WHERE board_no =#{board_no }
+   and boardtype_no=#{boardtype_no}
+   and empl_no=#{empl_no}
+    </update>	
+	
+	
+   <update id="boardLikeup" parameterType="likeTo">
+  	  update  board 
+	set board_like =board_like+1
+	 WHERE board_no =#{board_no }
+	and boardtype_no=#{boardtype_no}
+   </update>
+	
+	
+   <update id="boardLikedown" parameterType="likeTo">
+		update  board 
+		set board_like =board_like-1
+		 WHERE board_no =#{board_no }
+		and boardtype_no=#{boardtype_no}
+   </update>
+	
+	
+	<select id="boardAttachList" resultType="attach" parameterType="board">
+		select a.unityatchmnflno,
+		       a.ano,
+		       a.originalname,
+		       a.filename as fileName,
+		       a.uploadpath as uploadPath,
+		       a.filetype as fileType,
+		       a.regdate,
+		       a.filesize
+	      from attach a, board b
+	     where a.unityatchmnflno = b.unityatchmnflno
+           and board_no =#{board_no }
+           and boardtype_no=#{boardtype_no}
+           and not(b.unityatchmnflno=-1)   
+	</select>
+	
+   <update id="modifyAttach" parameterType="board">
+	 UPDATE board
+		SET 
+	        board_title= #{board_title}
+	        ,board_cont =#{board_cont}
+	        ,unityatchmnflno=#{unityatchmnflno}
+	        ,board_upddt=sysdate
+		WHERE
+			boardtype_no=#{boardtype_no}
+			and board_no=#{board_no} 
+   </update> 
+	
+	
+	
+	
+  </mapper>
+  
+  

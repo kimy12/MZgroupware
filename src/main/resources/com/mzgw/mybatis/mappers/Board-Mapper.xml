@@ -1,0 +1,442 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Board-Mapper">
+
+		<resultMap type="pop" id="PopVO">
+			<result column="P_NO" property="pno" />
+			<result column="BOARD_TITLE" property="boardTitle" />
+			<result column="BOARD_CONT" property="boardContent" />
+			<result column="START_DATE" property="startDate" />
+			<result column="END_DATE" property="endDate" />
+		</resultMap>
+
+<sql id="search">	
+		<if test="searchType == 'a'.toString()">
+			and ((a.board_title like '%'||#{keyword}||'%')
+				or(a.board_cont like '%'||#{keyword}||'%'))		
+		</if>
+		<if test="searchType == 't'.toString()">
+			and a.board_title like '%'||#{keyword}||'%'			
+		</if>
+		<if test="searchType == 'c'.toString()">
+			and a.board_cont like '%'||#{keyword}||'%'			
+		</if>	
+		<if test="searchType == 'w'.toString()">
+			and b.ncnm like '%'||#{keyword}||'%'		
+		</if>
+	</sql>
+
+	<select id="selectBoardList">
+		SELECT *
+		FROM BOARDTYPE	
+	</select>
+	
+	<select id="selectBoardByBno"  resultType="board">
+      SELECT A.*,
+			 b.ncnm,
+			 b.dept,
+			 b.id
+		FROM BOARD A, EMP B
+       WHERE A.BOARD_WRITER = B.EMPL_NO
+         AND BOARDTYPE_NO=#{boardtype_no}
+       <include refid="search" />
+       ORDER BY BOARD_RGDT ${nowSort}
+	</select>
+	
+	<select id="selectBoardListCount" resultType="int" >
+		SELECT COUNT(B.NAME)
+		  FROM BOARD A, EMP B
+	     WHERE A.BOARD_WRITER = B.EMPL_NO
+           AND BOARDTYPE_NO=#{boardtype_no}
+		<include refid="search" />
+	</select>
+	
+	<select id="selectNoticeDetail" resultType="board" parameterType="board">
+		SELECT B.BOARD_NO,
+		       b.BOARDTYPE_NO,
+		       b.BOARD_WRITER,
+		       b.PIN,
+		       a.ncnm,
+		       a.DEPT,
+		       b.BOARD_TITLE,
+		       b.BOARD_CONT,
+		       b.BOARD_RGDT,
+		       b.BOARD_UPDDT,
+		       b.BOARD_CNT,
+		       b.BOARD_LIKE,
+		       b.UNITYATCHMNFLNO,
+		       b.EBOARD_STATUS,
+		       TO_CHAR(C.START_DATE, 'YYYY-MM-DD') START_DATE,
+		       TO_CHAR(C.END_DATE, 'YYYY-MM-DD') END_DATE,
+		       b.boardncnm,
+		       b.board_head,
+		       a.id
+		       
+		FROM EMP A, BOARD B LEFT OUTER JOIN POPUP C ON B.BOARD_NO = C.B_NO
+		WHERE B.BOARD_WRITER = A.EMPL_NO
+	      AND B.BOARD_NO = #{board_no}
+	      AND B.BOARDTYPE_NO = #{boardtype_no}
+         
+	</select>
+	
+	
+	
+	
+	
+	<insert id="insertNoticeBoard" parameterType="board">
+		<selectKey keyProperty="board_no" resultType="int" order="BEFORE">
+			SELECT BOARD_SEQ.NEXTVAL 
+			  FROM DUAL
+		</selectKey>
+
+		INSERT INTO
+		BOARD(BOARDTYPE_NO,BOARD_NO,BOARD_TITLE,BOARD_WRITER,BOARD_CONT,BOARD_RGDT,UNITYATCHMNFLNO,PIN)
+		VALUES(#{boardtype_no},#{board_no},#{board_title},#{board_writer},#{board_cont},sysdate,#{unityatchmnflno},#{pin})
+
+	</insert>
+	
+	<update id="updateNoticeBoard" parameterType="board">
+
+		UPDATE BOARD
+		   SET BOARD_TITLE=#{board_title},
+		       BOARD_CONT=#{board_cont},
+		       PIN=#{pin},
+		       UNITYATCHMNFLNO=#{unityatchmnflno},
+		       BOARD_UPDDT=sysdate
+		 where BOARD_NO=#{board_no}
+		   AND BOARDTYPE_NO=#{boardtype_no}
+
+	</update>
+	
+	<select id="pinTotalCount" parameterType="int" resultType="int">
+  		SELECT COUNT(PIN)
+  		  FROM BOARD
+  		 WHERE BOARDTYPE_NO=#{boardtype_no}
+  		   AND PIN='y'
+  		
+  	</select>
+	
+	<select id="getPinlist" resultType="board">
+	
+<!-- 		select * 
+		from board 
+        where boardtype_no=#{boardtype_no}
+        and pin=1 
+        order by BOARD_RGDT desc -->
+        
+        SELECT
+        	a.*,
+		    (
+		        SELECT
+		            COUNT(*)
+		        FROM
+		            breply c
+		        WHERE
+		            a.board_no = c.board_no
+		    ) AS breply_count,
+			b.dept,
+			b.name,
+			b.id
+		FROM
+			board a,
+			emp b
+		WHERE
+			a.board_writer = b.EMPL_NO
+			and a.boardtype_no = #{boardtype_no}
+			and pin=1
+		ORDER BY
+			BOARD_RGDT DESC
+	</select>
+	
+	
+	<select id="searchBoardByBtno" resultType="board" parameterType="int">
+		SELECT
+		    a.*,
+		    (
+		        SELECT
+		            COUNT(*)
+		        FROM
+		            breply c
+		        WHERE
+		            a.board_no = c.board_no
+		    ) AS breply_count,
+		    b.dept,
+		    b.ncnm,
+		    b.id
+		FROM
+		    board a,
+		    emp b
+		WHERE
+		    a.board_writer = b.empl_no
+		    AND a.boardtype_no = #{boardtype_no}
+		           <include refid="search" />
+       ORDER BY BOARD_RGDT ${nowSort}
+    </select>
+	
+	<update id="insertFreeBoard" parameterType="board">
+
+		insert
+		into
+		board(boardtype_no,board_no,board_title,board_writer,board_cont,board_rgdt,unityatchmnflno,board_head,boardncnm)
+		values(#{boardtype_no},board_seq.nextval,#{board_title},#{board_writer},#{board_cont},sysdate,#{unityatchmnflno},#{board_head},#{boardncnm})
+
+	</update>
+		<update id="deleteFreeBoard" parameterType="board">
+
+		delete
+		from board
+		where board_no=#{board_no}
+		and boardtype_no=#{boardtype_no}
+
+	</update>
+		<update id="deleteNoticeBoard" parameterType="board">
+
+		delete
+		from board
+		where board_no=#{board_no}
+		and boardtype_no=#{boardtype_no}
+
+	</update>
+	
+	
+
+	<select id="selectNoticeBoardSeqNext" resultType="int">
+		select board_seq.nextval as board_no from dual
+	</select>
+
+
+	<update id="increaseViewCnt" parameterType="board">
+
+		update board
+		set board_cnt=board_cnt+1
+		where boardtype_no=#{boardtype_no}
+		and board_no=#{board_no}
+
+	</update>
+
+	<select id="selectNoticeAtcSeqNext" resultType="int">
+		select unity_seq.nextval as m_unityatchmnflno from dual
+	</select>
+	
+	<select id="boardAttachList" resultType="attach" parameterType="int">
+		select unityatchmnflno,
+		       ano,
+		       originalname,
+		       filename,
+		       uploadpath,
+		       filetype,
+		       regdate,
+		       filesize
+		from attach 
+		where unityatchmnflno=#{unityatchmnflno}
+	</select>
+	<!--parametertype=#에 들어가는애 타입  -->
+		<select id="breplyTotalCount" parameterType="int" resultType="int">
+  		
+  			select count(breply_cont)
+  			from breply
+  			where board_no=#{value}
+  
+  		</select>
+  		
+  		
+  		
+  		<!--  경조사 게시판  -->
+  		
+  		<select id="getEboardlist" parameterType="board">
+  		
+  			SELECT * 
+  			FROM BOARD
+  			WHERE BOARDTYPE_NO = 4
+  		
+  		</select>
+  		
+  		<!-- 경조사게시판 작성 -->
+  		<update id="insertEboard" parameterType="board">
+  		
+  			INSERT 
+  			INTO
+  			BOARD(	
+  					BOARD_NO,
+		  			BOARDTYPE_NO,
+		  			BOARD_WRITER,
+		  			BOARD_TITLE,
+		  			BOARD_CONT,
+		  			BOARD_RGDT,
+		  			BOARD_CNT,
+			  		UNITYATCHMNFLNO,
+			  		EBOARD_STATUS,
+		  			PIN,
+		  			eboard_date
+		  		)
+	  		VALUES(
+			  		board_seq.nextval,
+			  		#{boardtype_no},
+			  		#{board_writer},
+			  		#{board_title},
+			  		#{board_cont},
+			  		sysdate,
+			  		#{board_cnt},
+			  		-1,
+			  		#{eboard_status},
+			  		#{pin},
+			  		#{eboard_date}
+	  			)
+  		
+  		</update>	
+  		
+  		<!-- 경조사게시판 수정 -->
+  		<update id="updateEboard" parameterType="board">
+  		
+  			UPDATE BOARD
+  			SET
+	  			BOARD_TITLE=#{board_title},
+	  			BOARD_CONT=#{board_cont},
+	  			BOARD_UPDDT=SYSDATE,
+	  			EBOARD_STATUS=#{eboard_status},
+	  			UNITYATCHMNFLNO=#{unityatchmnflno},
+	  			PIN=#{pin}
+  			WHERE 
+  				BOARDTYPE_NO=#{boardtype_no}
+  			AND 
+  				BOARD_NO=#{board_no}
+  		
+  		
+  		
+  		</update>
+  		<!-- 경조사게시판 디테일 -->
+  		<!-- resulttype - db에서 가지고 와서 화면에 뿌리는 데이터타입        
+  		     parametertype -  db로 보내는 데이터 타입  -->
+  		<select id="getEboardDetail" resultType="board" parameterType="board">
+		  	
+		  	SELECT  
+		  		
+		  		A.BOARD_NO,
+		        A.BOARDTYPE_NO,
+		        A.BOARD_WRITER,
+		        A.BOARD_TITLE,
+		        A.BOARD_CONT,
+		        A.BOARD_RGDT,
+		        A.BOARD_CNT,
+		        A.UNITYATCHMNFLNO,
+		        A.EBOARD_STATUS,
+		        A.PIN,
+		        B.NAME,
+		        B.DEPT,
+		        B.ID,
+		        A.EBOARD_DATE
+		
+		FROM 
+		
+			BOARD A, EMP B
+		
+		WHERE 
+		
+			A.BOARD_WRITER = B.EMPL_NO
+			
+		AND 
+		
+			A.BOARDTYPE_NO=4
+		
+		AND 
+		
+			A.BOARD_NO=#{board_no}
+  		
+  		</select>	
+  		
+  		<delete id="deleteEboard" parameterType="int">
+  		
+  			delete
+			from 
+				board
+				
+			where 
+				boardtype_no=4
+				
+			and 
+				board_no=#{board_no}
+  		</delete>
+
+   <update id="updateFreeboard" parameterType="board">
+	 UPDATE board
+		SET 
+	        board_title= #{board_title}
+	        ,board_cont =#{board_cont}
+	        ,unityatchmnflno=#{unityatchmnflno}
+	        ,board_upddt=sysdate
+	        ,board_head=#{board_head}
+	        ,boardncnm=#{boardncnm}
+		WHERE
+			boardtype_no=#{boardtype_no}
+			and board_no=#{board_no} 
+   </update> 
+   <update id="insertLike" parameterType="likeTo">
+  	  	insert into liketo
+					(like_no,
+					board_no,
+					empl_no,
+					likeCheck,
+					boardtype_no)
+			values
+					(
+					LIKE_SEQ.NEXTVAL,
+					#{board_no },
+					#{empl_no},
+					1,
+					#{boardtype_no}
+					)
+   </update>
+	
+	
+	
+	<update id="deleteLike" parameterType="likeTo">
+		DELETE 
+  FROM liketo
+ WHERE board_no =#{board_no }
+   and boardtype_no=#{boardtype_no}
+   and empl_no=#{empl_no}
+    </update>	
+	
+	
+   <update id="boardLikeup" parameterType="likeTo">
+  	  update  board 
+	set board_like =board_like+1
+	 WHERE board_no =#{board_no }
+	and boardtype_no=#{boardtype_no}
+   </update>
+	
+	
+   <update id="boardLikedown" parameterType="likeTo">
+		update  board 
+		set board_like =board_like-1
+		 WHERE board_no =#{board_no }
+		and boardtype_no=#{boardtype_no}
+   </update>
+ 
+	<select id="selectLikeEmp"  parameterType="likeTo" resultType="likeTo">
+			
+			select *
+			from likeTo
+			where board_no =#{board_no }
+			and empl_no=#{empl_no}
+			and boardtype_no=#{boardtype_no}
+	</select>
+	
+	
+	<select id="popupList" resultMap="PopVO">
+		SELECT A.BOARD_TITLE,
+		       A.BOARD_CONT,
+		       B.*
+		  FROM BOARD A, POPUP B
+		 WHERE A.BOARD_NO = B.B_NO
+		   AND A.BOARDTYPE_NO = 1
+	</select>
+	
+</mapper>
+  
+  

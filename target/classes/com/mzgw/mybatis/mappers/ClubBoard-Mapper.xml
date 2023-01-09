@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="ClubBoard-Mapper">
+
+  	  
+  	  <select id="selectClubNoticeBoardList" parameterType="hashmap" resultType="clubBoard">
+  	  	SELECT a.*,
+  	  		b.dept,
+  	  		b.ncnm,
+  	  					b.id
+  	  	  FROM CLUBBOARD a, emp b
+  	  	  
+  	  	 WHERE a.CLUBBOARD_WRITER = b.empl_no 
+  	  	 AND CLUB_NO = #{club_no}
+  	  	 AND CLUBBOARDTYPE_NO = 1
+  	  	 order by a.clubboard_rgdt ${nowSort}
+  	  </select>
+  	  
+  	  <select id="selectClubBoardList" parameterType="hashmap" resultType="clubBoard">
+  	  	SELECT a.*,
+  	  	
+  	  	(
+		        SELECT
+		            COUNT(*)
+		        FROM
+		            clubreply c
+		        WHERE
+		            a.clubboard_no = c.clubboard_no
+		    ) AS clubreply_count,
+  	  		b.dept,
+  	  		b.ncnm,
+  	  					b.id 
+  	  	  FROM CLUBBOARD a, emp b
+  	  	  
+  	  	 WHERE a.CLUBBOARD_WRITER = b.empl_no 
+  	  	 AND CLUB_NO = #{club_no}
+  	  	 AND CLUBBOARDTYPE_NO = 2
+  	  	 order by a.clubboard_rgdt ${nowSort}
+  	  </select>
+
+  	   <select id="selectClubBoardListCount"  parameterType="hashmap" resultType="int">
+		select 
+		count(*) 
+  	  	  FROM CLUBBOARD a, emp b
+  	  	 WHERE a.CLUBBOARD_WRITER = b.empl_no 
+  	  	 AND CLUB_NO = #{club_no}
+  	  	 AND clubboardtype_no = #{clubboardtype_no}
+  	  	 order by a.clubboard_rgdt desc
+
+  	  </select>
+
+  	  
+  	  
+  	  
+  	  <select id="selectclubBoardSeqNext" resultType="int">
+			SELECT unity_seq.nextval as unityatchmnflno FROM dual
+	  </select>
+  	  
+  	  	<update id="insertClubBoard" parameterType="clubBoard">
+		insert
+		into
+		clubboard
+		(clubboardtype_no
+		,clubboard_no
+		,clubboard_title
+		,clubboard_writer
+		,clubboard_cont
+		,clubboard_rgdt
+		,unityatchmnflno
+		,pin
+		,clubboard_like
+		,club_no
+		
+		
+		)
+		values
+		(
+		#{clubboardtype_no}
+		,clubboard_no_SEQ.NEXTVAL
+		,#{clubboard_title}
+		,#{clubboard_writer}
+		,#{clubboard_cont}
+		,sysdate
+		,#{unityatchmnflno}
+		,#{pin}
+		,0
+		,#{club_no}
+		)
+
+	</update>
+	
+  	  <update id="increaseViewCnt" parameterType="clubBoard">
+
+		update clubBoard
+		set clubboard_cnt=clubboard_cnt+1
+		where clubboardtype_no=#{clubboardtype_no}
+		and clubboard_no=#{clubboard_no}
+
+	</update>
+  	  
+  	  
+  	  	<select id="selectBoardByBoardNo"  resultType="clubBoard">
+              select a.*,
+              b.dept,
+              b.ncnm,
+              b.id 
+		from clubboard a,emp b
+        where a.clubboard_writer=b.empl_no
+		and  clubboard_no=#{clubboard_no}
+        and clubboardtype_no=#{clubboardtype_no}
+	</select>
+	
+	
+	<select id="clubBoardAttachList" resultType="attach" parameterType="clubBoard">
+		select *
+	      from attach
+           where unityatchmnflno =#{unityatchmnflno }
+           and not(unityatchmnflno=-1)   
+	</select>
+
+
+   <update id="modifyAttach" parameterType="clubBoard">
+	 UPDATE clubboard
+		SET 
+	        clubboard_title= #{clubboard_title}
+	        ,clubboard_cont =#{clubboard_cont}
+	        ,unityatchmnflno=#{unityatchmnflno}
+	        ,clubboard_upddt=sysdate
+		WHERE
+			clubboardtype_no=#{clubboardtype_no}
+			and clubboard_no=#{clubboard_no} 
+   </update> 
+	
+	<update id="deleteClubBoard" parameterType="clubBoard">
+
+		delete
+		from clubboard
+			where clubboardtype_no=#{clubboardtype_no}
+			and clubboard_no=#{clubboard_no} 
+	</update>
+	
+
+	
+	<select id="selectGalleryListByClubNo" parameterType="int" resultType="clubBoard">
+		select *
+		from clubboard
+		where club_no = #{club_no}
+		and CLUBBOARDTYPE_NO = 3
+		order by clubboard_rgdt desc
+	</select>
+		<select id="selectGalleryListByClubNoCount" parameterType="hashmap" resultType="int">
+		select count(*)
+		from clubboard
+		where club_no = #{club_no}
+		and CLUBBOARDTYPE_NO = 3
+	</select>
+
+	<select id="selectGalleryDetail"  parameterType="int" resultType="clubBoard">
+			
+			select a.*,
+        	b.dept,
+        				b.id
+			from clubboard a, emp b
+            where a.clubboard_writer=b.ncnm
+			and clubboard_no=#{club_no}
+
+	
+	</select>
+
+	<update id="deleteGalleryContent" parameterType="clubBoard">
+
+		delete
+		from clubboard
+		where clubboard_no=#{clubboard_no}
+
+	</update>
+	
+	
+	
+	
+	
+	   <update id="insertLike" parameterType="clubliketo">
+  	  	insert into clubliketo
+					(clublike_no,
+					clubboard_no,
+					empl_no,
+					likecheck,
+					clubboardtype_no)
+			values
+					(
+					like_seq.nextval,
+					#{clubboard_no },
+					#{empl_no},
+					1,
+					#{clubboardtype_no}
+					)
+   </update>
+	
+	
+	
+	<update id="deleteLike" parameterType="clubliketo">
+		delete 
+  from clubliketo
+ where clubboard_no =#{clubboard_no }
+   and clubboardtype_no=#{clubboardtype_no}
+   and empl_no=#{empl_no}
+    </update>	
+	
+	
+   <update id="boardLikeup" parameterType="clubliketo">
+  	  update  clubboard 
+	set clubboard_like =clubboard_like+1
+	 where clubboard_no =#{clubboard_no }
+	and clubboardtype_no=#{clubboardtype_no}
+   </update>
+	
+	
+   <update id="boardLikedown" parameterType="clublikeTo">
+		update  clubboard 
+		set clubboard_like =clubboard_like-1
+		 WHERE clubboard_no =#{clubboard_no }
+		and clubboardtype_no=#{clubboardtype_no}
+   </update>
+	
+	<select id="selectLikeEmp"  parameterType="clublikeTo" resultType="clublikeTo">
+			
+			select *
+			from clublikeTo
+			where clubboard_no =#{clubboard_no }
+			and empl_no=#{empl_no}
+			and clubboardtype_no=#{clubboardtype_no}
+
+	
+	</select>
+	
+		<select id="selectEmpByBno"  parameterType="clubBoard" resultType="emp">
+	
+             select a.dept as dept,
+                    a.ncnm as ncnm,
+                    a.id
+               from emp a,(select *
+                             from clubboard
+							where clubboard_no=#{clubboard_no}
+						      and clubboardtype_no=#{clubboardtype_no})b
+              where a.empl_no = b.clubboard_writer
+	</select>
+	
+	<select id="pinTotalCount" parameterType="int" resultType="int">
+  		SELECT COUNT(PIN)
+  		  FROM clubboard
+  		 WHERE club_no=#{club_no}
+  		 and clubboardtype_no=1
+  		   AND PIN=1
+  		
+  	</select>
+	
+		
+</mapper>  
+
+

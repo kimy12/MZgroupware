@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="SetleEmp-Mapper">
+
+	<resultMap type="setleEmp" id="setleEmpMap">
+		<result property="setleNo" column="SETLE_NO"/>
+		<result property="emplNo" column="EMPL_NO"/>
+		<result property="agrSttus" column="AGR_STTUS"/>
+		<result property="cotent" column="COTENT"/>
+		<result property="empNm" column="EMP_NM"/>
+		<result property="empSign" column="EMP_SIGN"/>	
+	</resultMap>
+	
+
+	
+	
+	
+	<select id="selectSetleEmpListby" parameterType="int" resultMap="setleEmpMap" >
+		select
+		* 
+		from setle_emp
+		where SETLE_NO = #{setleNo}
+	</select>
+	
+	<update id="insertSelteEmp" parameterType="setleEmp">
+		
+		insert into
+			SETLE_EMP
+			(SETLE_NO,
+			 EMPL_NO,
+			 AGR_STTUS,
+			 COTENT,
+			EMP_NM) 
+			VALUES(	
+				#{setleNo}, 
+				#{emplNo}, 
+				#{agrSttus}, 
+				#{cotent}, 
+				#{empNm} 
+					)
+	
+	</update>
+	
+	<delete id="deleteAllSetlEmpBySetleNo" parameterType="int">
+		DELETE FROM SETLE_EMP
+
+		WHERE SETLE_NO = #{setleNo}
+	</delete>
+	
+	<update id="updateSttusAgree" parameterType="setle">
+		update SETLE_EMP
+		SET AGR_STTUS=#{agrSttus},
+			EMP_SIGN=#{empSign}
+			
+		where SETLE_NO=#{setleNo}
+		and EMPL_NO = #{emplNo}
+	</update>
+	
+	<update id="updateSttusDisagree" parameterType="setle">
+		update SETLE_EMP
+		SET AGR_STTUS=#{agrSttus},
+			COTENT=#{cotent}
+			
+		where SETLE_NO=#{setleNo}
+		and EMPL_NO = #{emplNo}
+	</update>
+	
+</mapper>

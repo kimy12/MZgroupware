@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+  <mapper namespace="CustomBoardReply-Mapper">
+  
+  		<select id="selectBReplyListCount" resultType="int">
+  		
+  			select count(*)
+			from breply a, emp b
+			where a.empl_no = b.EMPL_NO
+			and a.board_no = #{board_no}
+			and a.boardtype_no = #{boardtype_no}
+			order by breply_regdate desc
+  		
+  		</select>
+  		
+  		
+  		<select id="selectBReplyList" resultType="breply">
+  		
+  			select a.*,
+			b.ncnm,
+			b.dept
+			from breply a, emp b
+			where a.empl_no = b.EMPL_NO
+			and a.board_no = #{board_no}
+			and a.boardtype_no = #{boardtype_no}
+			order by breply_regdate desc
+  		
+  		</select>
+  		
+	<update id="insertBoardReply" parameterType="breply">
+		Insert into BREPLY
+		(	BREPLY_NO,
+			BOARD_NO,
+			BOARDTYPE_NO,
+			BREPLY_CONT,
+			breply_regdate,
+			EMPL_NO)
+		VALUES(
+			breply_seq.nextval,
+			#{board_no},
+			#{boardtype_no},
+			#{breply_cont},
+			SYSDATE,
+			#{empl_no}
+		)
+		
+	</update>
+	
+	
+  		<update id="updateBoardReply" parameterType="breply">
+  		
+  			update breply
+  			set
+  			breply_cont=#{breply_cont},
+  			breply_mofdate=sysdate
+  			where breply_no = #{breply_no}
+  			
+  		</update>
+	
+	
+	<delete id="deleteBoardReply" parameterType="int">
+		DELETE FROM breply
+  			where breply_no = #{breply_no}
+	</delete>
+	
+	
+	
+	
+	
+  </mapper>
+  

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Refrn-Mapper">
+	
+	<update id="insertRefrn" parameterType="refrn">
+		insert 
+		into
+		refrn (refrn_unity_no, refrn_no, emp_nickname)
+		values
+		(#{refrn_unity_no},#{refrn_no},#{emp_nickname})
+	</update>
+	
+	<select id="selectRefrnSeqNext" resultType="int">
+		select refrn_unity_no_seq.nextval as refrn_unity_no from dual
+	</select>
+	
+	<select id="selectRefrnPpl" parameterType="PdsPrivate" resultType="refrn">
+		select emp_nickname
+		from refrn
+		where refrn_unity_no = (select REFRN_UNITY_NO
+	                         from pds_private
+	                         where m_unityatchmnflno = #{m_unityatchmnflno})
+	</select>
+	
+	<update id="deleteAllByUnity" parameterType="refrn">
+		delete
+		from refrn
+		where refrn_unity_no=#{refrn_unity_no}
+	</update>
+	
+</mapper>  
+
+

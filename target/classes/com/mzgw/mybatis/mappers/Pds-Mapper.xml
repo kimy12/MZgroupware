@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Pds-Mapper">
+
+	<sql id="search">	
+		<if test="searchType == 's'.toString()">
+			and (m_title like '%'||#{keyword}||'%')
+		</if>
+	</sql>
+	
+	<sql id="searchForE">	
+		<if test="searchType == 's'.toString()">
+			where (e_title like '%'||#{keyword}||'%')
+		</if>
+	</sql>
+	
+	<sql id="searchForD">	
+		<if test="searchType == 's'.toString()">
+			and (d_title like '%'||#{keyword}||'%')
+		</if>
+	</sql>
+	
+	<select id="selectPdsDepFolders" parameterType="hashmap" resultType="PdsDep">
+		select
+		*
+		from
+		pds_Dep
+		where dept = #{dept}
+		<include refid="searchForD" />
+		order by d_regdate ${nowSort}
+	</select>
+	
+	<select id="selectPdsDepFoldersCount" parameterType="hashmap" resultType="int">
+		select count(*)
+		from
+		pds_Dep
+		where dept = #{dept}
+		<include refid="searchForD" />
+		order by d_regdate ${nowSort}
+	</select>
+	
+	
+	<select id="selectPdsPublicFolders" parameterType="hashmap" resultType="PdsPublic">
+		select
+		*
+		from
+		pds_public
+		<include refid="searchForE" />
+		order by e_regdate ${nowSort}
+	</select>
+	
+	<select id="selectPdsPublicFoldersCount" parameterType="hashmap" resultType="int">
+		select count(*)
+		from
+		pds_public
+		<include refid="searchForE" />
+		order by e_regdate ${nowSort}
+	</select>
+	
+	<update id="insertPdsPrivate" parameterType="PdsPrivate">
+		insert 
+		into
+		pds_private(m_unityatchmnflno, m_title, m_writer, refrn_unity_no)
+		values
+		(#{m_unityatchmnflno},#{m_title},#{m_writer}, #{refrn_unity_no})
+		
+	</update>
+	
+	<update id="updatePdsPrivate" parameterType="PdsPrivate">
+		update pds_private
+		set
+		m_title = #{m_title}, 
+		refrn_unity_no = #{refrn_unity_no},
+        m_updatedate = sysdate
+		where
+		m_unityatchmnflno = #{m_unityatchmnflno}
+	</update>
+	
+	<update id="insertPdsPublic" parameterType="PdsPublic">
+		insert 
+		into
+		pds_public(e_unityatchmnflno, e_title, e_writer)
+		values
+		(#{e_unityatchmnflno},#{e_title},#{e_writer})
+	</update>
+	
+	<update id="insertPdsDep" parameterType="PdsDep">
+		insert 
+		into
+		pds_dep(d_unityatchmnflno, d_title, d_writer, dept)
+		values
+		(#{d_unityatchmnflno},#{d_title},#{d_writer}, #{dept})
+	</update>
+	
+	
+	<select id="selectPdsPrivateSeqNext" resultType="int">
+		select unity_seq.nextval as m_unityatchmnflno from dual
+	</select>
+	
+	<select id="selectPdsPublicSeqNext" resultType="int">
+		select unity_seq.nextval as e_unityatchmnflno from dual
+	</select>
+	
+	<select id="selectPdsDepSeqNext" resultType="int">
+		select unity_seq.nextval as d_unityatchmnflno from dual
+	</select>
+	
+	<select id="selectPdsPrivateFolders" parameterType="hashmap" resultType="PdsPrivate">
+		
+		SELECT *
+
+		FROM(SELECT *
+	        FROM PDS_PRIVATE
+	        
+	        WHERE  REFRN_UNITY_NO IN (select REFRN_UNITY_NO
+	                                        FROM REFRN
+	                                        WHERE EMP_NICKNAME = #{ncnm})
+	        <include refid="search" />
+	        
+	        UNION
+	        
+	        SELECT *
+	        FROM PDS_PRIVATE
+	        WHERE M_WRITER = #{ncnm}
+	        <include refid="search" />
+	        )
+        
+		order by m_regdate ${nowSort}
+	</select>
+	
+	<select id="selectPdsPrivateFoldersCount" parameterType="hashmap" resultType="int">
+		select count(*)
+		from
+		(SELECT *
+		        FROM PDS_PRIVATE
+		        
+		        WHERE  REFRN_UNITY_NO IN (select REFRN_UNITY_NO
+		                                        FROM REFRN
+		                                        WHERE EMP_NICKNAME = #{ncnm})
+		        <include refid="search" />
+		        
+		        UNION
+		        
+		        SELECT *
+		        FROM PDS_PRIVATE
+		        WHERE M_WRITER = #{ncnm}
+		        <include refid="search" />
+		        )
+        
+	</select>
+	
+	<select id="selectPdsBin" resultType="PdsPrivate">
+		select
+		*
+		from
+		pds_private
+		where m_writer = #{ncnm}
+		and m_del= 'Y'
+	</select>
+	
+	
+	<select id="selectPdsPrivateByM" resultType="PdsPrivate">
+		select
+		*
+		from
+		pds_private
+		where m_unityatchmnflno = #{m_unityatchmnflno}
+	</select>
+	
+	
+	
+	<select id="selectRefrnListAtPrivate" resultType="PdsPrivate">
+		select *
+		from pds_private
+		where REFRN_UNITY_NO in (select REFRN_UNITY_NO
+                            	from refrn
+                           		 where emp_nickname = #{ncnm})
+	</select>
+	
+	<!-- <update id="insertPdsPublicTitle" parameterType="PdsPrivate">
+		update 
+		pds_private 
+		set 
+		m_title= #{m_title}
+		where m_unityatchmnflno = #{m_unityatchmnflno}
+		and m_writer = #{m_writer}	
+	</update> -->
+	
+	<update id="insertPdsPrivateTitle" parameterType="PdsPrivate">
+		update 
+		pds_private 
+		set 
+		m_title=#{m_title}
+		where refrn_unity_no = #{refrn_unity_no}
+	</update>
+	
+	<update id="insertPdsPublicTitle" parameterType="PdsPublic">
+		update 
+		pds_public 
+		set 
+		e_title=#{e_title}
+		where e_unityatchmnflno = #{e_unityatchmnflno}
+	</update>
+	
+	<update id="insertPdsDepTitle" parameterType="PdsDep">
+		update 
+		pds_Dep 
+		set 
+		d_title=#{d_title}
+		where d_unityatchmnflno = #{d_unityatchmnflno}
+	</update>
+	
+	<update id="updateDel" parameterType="int">
+		update 
+		pds_private 
+		set 
+		m_del= 'Y'
+		where m_unityatchmnflno = #{m_unityatchmnflno}
+	</update>
+	
+	<update id="recoverDel" parameterType="int">
+		update 
+		pds_private 
+		set 
+		m_del= 'N'
+		where m_unityatchmnflno = #{m_unityatchmnflno}
+	</update>
+	
+	<update id="deleteFolder" parameterType="int">
+
+		delete
+		from pds_private
+		where m_unityatchmnflno=#{m_unityatchmnflno}
+
+	</update>
+	
+	<update id="deleteFolderForE" parameterType="int">
+
+		delete
+		from pds_public
+		where e_unityatchmnflno=#{e_unityatchmnflno}
+
+	</update>
+	
+	<update id="deleteFolderForD" parameterType="int">
+
+		delete
+		from pds_Dep
+		where d_unityatchmnflno=#{d_unityatchmnflno}
+
+	</update>
+	
+</mapper>

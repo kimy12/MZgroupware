@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+  
+<mapper namespace="Calendar-Mapper">
+
+	<select id="selectScheduleList" parameterType="calendar" resultType="calendar">
+	    SELECT SNO,
+	           TITLE,
+    		   STARTD, 
+    		   END,
+	           TYPE,
+	           TEXTCOLOR,
+	           BACKGROUNDCOLOR,
+	           USERNAME,
+	           DESCRIPTION,
+	           DEPT
+	      FROM SCHEDULE
+		 WHERE (USERNAME = #{username} AND DEPT = #{dept})
+		    OR TYPE = '회사'
+		   
+	</select>
+
+	<update id="insertSchedule" parameterType="calendar">
+		INSERT INTO 
+		   SCHEDULE
+		     VALUES
+		     (cal_seq.nextval,#{title}, to_date(#{startd}, 'YYYY-MM-DD HH24:MI'), to_date(#{end}, 'YYYY-MM-DD HH24:MI'), #{type},#{textColor},#{backgroundColor},#{username}, #{description}, #{dept})
+	</update>
+	
+	<update id="updateSchedule" parameterType="calendar">
+		UPDATE SCHEDULE
+		   SET TITLE = #{title},
+		       STARTD = to_date(#{startd}, 'YYYY-MM-DD HH24:MI'),
+		       END = to_date(#{end}, 'YYYY-MM-DD HH24:MI'),
+		       DESCRIPTION = #{description},
+		       TYPE = #{type},
+		       BACKGROUNDCOLOR = #{backgroundColor},
+		       TEXTCOLOR = #{textColor}
+		 WHERE SNO = #{sno}
+	</update>
+	
+	<update id="dragUpdateSchedule" parameterType="calendar">
+		UPDATE SCHEDULE
+		   SET STARTD = to_date(#{startd}, 'YYYY-MM-DD HH24:MI'),
+		       END = to_date(#{end}, 'YYYY-MM-DD HH24:MI')
+		 WHERE SNO = #{sno}
+	</update>
+	
+	<update id="deleteSchedule" parameterType="calendar">
+		DELETE FROM SCHEDULE WHERE SNO = #{sno}
+	</update>
+</mapper>

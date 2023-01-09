@@ -1,0 +1,171 @@
+@charset "utf-8";
+
+html, body{
+	margin:0;
+}
+
+.flex{
+	display: flex !important;
+}
+
+.ju-sp-bt{
+	justify-content: space-between;
+}
+
+.mb-10{
+	margin-bottom:10px;
+}
+
+.mb-20{
+	margin-bottom:20px;
+}
+
+.mb-30{
+	margin-bottom:30px;
+}
+
+.mb-50{
+	margin-bottom:50px;
+}
+
+.mt-20{
+	margin-top:20px;
+}
+
+.mt-30{
+	margin-top:30px;
+}
+
+
+
+.find-wrap{
+	margin:0 auto;
+	width:60%;
+	padding:25px 0px;
+	box-sizing:border-box;
+}
+
+.find-wrap label{
+	display: inline-block;
+    width: 80px;
+    vertical-align: middle;
+    font-weight: 700;
+}
+
+.find-wrap .tit{
+    text-align: center;
+    font-size:40px;
+}
+
+.find-wrap .tit h4{
+	margin-top: 0px;
+	margin-bottom:30px;
+}
+
+.find-wrap .viInut{
+	width: 75%;
+    height: 40px;
+    border: 1px solid #A6A6A6;
+    padding: 5px 10px;
+    box-sizing: border-box;
+}
+
+.txt h5{
+	margin:0;
+	margin-bottom:10px;
+	font-size:20px;
+}
+
+.txt p{
+	margin:0;
+}
+
+.find-btn{
+	display: flex;
+    justify-content: space-between;
+}
+
+.find-btn input{
+	width: 50%;
+    padding: 10px 0px 13px 0px;
+    display: inline-block;
+    font-size:16px;
+    cursor: pointer;
+}
+
+.find-btn input.cl{
+	background: none;
+    border-radius: 0;
+    border-right: 0;
+    border: 2px solid #A6A6A6;
+    color:#A6A6A6;
+}
+
+.find-btn input.ck{
+	background: #000;
+    border-radius: 0;
+    color:#fff;
+    border:1px solid #000;
+}
+
+.col{
+	justify-content: space-between;
+    display: flex;
+    align-items: center;
+}
+
+.col.ph .nump{
+	display: flex;
+	width: 75%;
+}
+
+.col.ph .nump #phone{
+	width: 80%;
+    height: 40px;
+    border: 1px solid #A6A6A6;
+    border-right: 0;
+    padding: 5px 10px;
+    box-sizing: border-box;
+}
+
+.col.ph .nump #sendNum{
+	background: #444;
+    color: #fff;
+    border: 0;
+    padding: 5px 10px 6px 10px;
+    cursor: pointer;
+}
+
+.popC{
+    background: #000;
+    border-radius: 0;
+    color: #fff;
+    border: 1px solid #000;
+    width: 100%;
+    padding: 10px 0px 13px 0px;
+    display: inline-block;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+{
+	margin: 80px 0px;
+}
+
+.reulstPwd{
+	width: 75%;
+}
+
+.reulstPwd #certification{
+	width: 43%;
+    height: 30px;
+    border: 1px solid #A6A6A6;
+    padding: 5px 10px;
+    box-sizing: border-box;
+    border-right: 0;
+}
+
+.reulstPwd #numConfirm{
+	border: 1px solid #444;
+    background: 0;
+}

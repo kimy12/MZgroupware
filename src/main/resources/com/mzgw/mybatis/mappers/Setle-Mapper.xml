@@ -1,0 +1,292 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Setle-Mapper">
+	<resultMap type="setle" id="setleMap">
+		<result property="setleNo" column="SETLE_NO"/>
+		<result property="setleSj" column="SETLE_SJ"/>
+		<result property="setleCn" column="SETLE_CN"/>
+		<result property="writngOn" column="WRITNG_ON"/>
+		<result property="sttusNo" column="STTUS_NO"/>
+		<result property="setleAttach" column="SETLE_ATTACH"/>
+		<result property="setleFormNo" column="SETLE_FORM_NO"/>
+		<result property="formInputs" column="FORM_INPUTS"/>
+		<result property="agrStartDate" column="AGR_START_DATE"/>
+		<result property="agrEndDate" column="AGR_END_DATE"/>
+		<result property="evlStartDate" column="EVL_START_DATE"/>
+		<result property="evlEndDate" column="EVL_END_DATE"/>
+		<result property="setleWriter" column="SETLE_WRITER"/>
+		<result property="writerDepart" column="WRITER_DEPART"/>
+		<result property="aplctDate" column="APLCT_DATE"/>
+		<result property="lastSetleEmp" column="LAST_SETLE_EMP"/>
+	</resultMap>
+	<resultMap type="hashmap" id="setlePerCalc">
+		<result property="lateDocCount" column="LATE_DOC_COUNT"/>
+		<result property="cancDocCount" column="CANC_DOC_COUNT"/>
+		<result property="compDocCount" column="COMP_DOC_COUNT"/>
+		<result property="procDocCount" column="PROC_DOC_COUNT"/>
+		<result property="totaDocCount" column="TOTA_DOC_COUNT"/>
+	</resultMap>
+	
+	<sql id="search">	
+		<if test="searchType == 'a'.toString()">
+			and ((SETLE_SJ like '%'||#{keyword}||'%')
+				or(SETLE_CN like '%'||#{keyword}||'%'))		
+		</if>
+		<if test="searchType == 's'.toString()">
+			and SETLE_SJ like '%'||#{keyword}||'%'			
+		</if>
+		<if test="searchType == 'c'.toString()">
+			and SETLE_CN like '%'||#{keyword}||'%'			
+		</if>
+	</sql>	
+	
+	<select id="selectSetleBySetleNo" parameterType="int" resultMap="setleMap">
+		select
+		*
+		from setle
+		where SETLE_NO=#{setleNo}
+	</select>
+	
+	<select id="selectsetlePerCalc" resultMap="setlePerCalc" parameterType="hashmap">
+		SELECT (select count(*)
+            from SETLE
+            where DELETLE_ON = 'N'
+            AND STTUS_NO = 0
+            AND SETLE_WRITER = #{empl_no}) AS LATE_DOC_COUNT,
+        (select count(*)
+            from SETLE
+            where DELETLE_ON = 'N'
+            AND STTUS_NO = 2
+            AND SETLE_WRITER = #{empl_no}) AS CANC_DOC_COUNT,
+        (select count(*)
+            from SETLE
+            where DELETLE_ON = 'N'
+            AND STTUS_NO = 3
+            AND SETLE_WRITER = #{empl_no}) AS COMP_DOC_COUNT,
+        (select count(*)
+            from SETLE
+            where DELETLE_ON = 'N'
+            AND STTUS_NO = 1
+            AND SETLE_WRITER = #{empl_no}) AS PROC_DOC_COUNT,
+        (select count(*)
+            from SETLE
+            where DELETLE_ON = 'N'
+            AND SETLE_WRITER = #{empl_no}) AS TOTA_DOC_COUNT
+        FROM DUAL
+	</select>
+	
+	<select id="selectSearchSetleList" resultType="setle">
+		select
+		* 
+		from setle
+		where id is not null
+		<include refid="search" />
+		order by WRITNG_ON desc
+	</select>
+	<select id="selectSearchSetleListCount" resultType="int">
+		select
+		count(*) 
+		from setle
+		where id is not null
+		<include refid="search" />
+	</select>
+	
+	<select id="selectSetleListByWriterNo" parameterType="hashmap" resultMap="setleMap">
+		select
+		*
+		from setle
+		where setle_writer=#{empl_no}
+		<include refid="search" />
+		<if test="sttusNo != -1">
+		and STTUS_NO = #{sttusNo}	
+		</if>
+		AND DELETLE_ON = 'N'
+		order by WRITNG_ON ${nowSort}
+	</select>
+	
+	<select id="selectSetleListCountByWriterNo" parameterType="hashmap" resultType="int">
+		select
+		count(*)
+		from setle
+		where setle_writer=#{empl_no}
+		<include refid="search" />
+		<if test="sttusNo != -1">
+		and STTUS_NO = #{sttusNo}	
+		</if>
+		AND DELETLE_ON = 'N'
+		order by WRITNG_ON desc
+	</select>
+	
+		<select id="selectDeleteSetleListByWriterNo" parameterType="hashmap" resultMap="setleMap">
+		select
+		*
+		from setle
+		where setle_writer=#{empl_no}
+		<include refid="search" />
+		AND DELETLE_ON = 'Y'
+		order by WRITNG_ON ${nowSort}
+	</select>
+	
+	<select id="selectDeleteSetleListCountByWriterNo" parameterType="hashmap" resultType="int">
+		select
+		count(*)
+		from setle
+		where setle_writer=#{empl_no}
+		<include refid="search" />
+		AND DELETLE_ON = 'Y'
+		order by WRITNG_ON desc
+	</select>
+	
+	<select id="selectSetleListByDepartNm" parameterType="hashmap" resultMap="setleMap">
+		select
+		*
+		from setle
+		where WRITER_DEPART=#{dept}
+		<include refid="search" />
+		order by WRITNG_ON ${nowSort}
+	</select>
+	
+	<select id="selectSetleListCountByDepartNm" parameterType="hashmap" resultType="int">
+		select
+		count(*)
+		from setle
+		where WRITER_DEPART=#{dept}
+		<include refid="search" />
+		order by WRITNG_ON desc
+	</select>
+	<select id="selectRecentSetleListBySetleEmpSetleNo" parameterType="hashmap" resultMap="setleMap">
+		select
+		*
+		from setle
+		where SETLE_NO in (SELECT SETLE_NO
+                            FROM SETLE_EMP
+                            WHERE EMPL_NO = #{empl_no}
+                            AND AGR_STTUS != 3)
+        AND STTUS_NO != 0
+        AND STTUS_NO = 1
+         <![CDATA[AND AGR_START_DATE < SYSDATE
+        AND AGR_END_DATE > SYSDATE]]> 
+        order by WRITNG_ON DESC
+    </select>
+	<select id="selectSetleListBySetleEmpSetleNo" parameterType="hashmap" resultMap="setleMap">
+		select
+		*
+		from setle
+		where SETLE_NO in (SELECT SETLE_NO
+                            FROM SETLE_EMP
+                            WHERE EMPL_NO = #{empl_no})
+        AND STTUS_NO != 0
+		<include refid="search" />
+		order by WRITNG_ON ${nowSort}
+	</select>
+	
+	<select id="selectSetleListCountBySetleEmpSetleNo" parameterType="hashmap" resultType="int">
+		select
+		count(*)
+		from setle
+		where SETLE_NO in (SELECT SETLE_NO
+                            FROM SETLE_EMP
+                            WHERE EMPL_NO = #{empl_no})
+        AND STTUS_NO != 0
+		<include refid="search" />
+		order by WRITNG_ON ${nowSort}
+	</select>
+	
+	<select id="selectSetleSeq" resultType="int">
+		select
+		SETLE_NO_SEQ.nextval
+		from dual
+	</select>
+	
+	<update id="insertSetle" parameterType="setle">
+		Insert into SETLE 
+		(SETLE_NO, 
+		SETLE_SJ, 
+		SETLE_CN, 
+		WRITNG_ON, 
+		STTUS_NO, 
+		SETLE_ATTACH, 
+		SETLE_FORM_NO, 
+		FORM_INPUTS, 
+		AGR_START_DATE, 
+		AGR_END_DATE, 
+		EVL_START_DATE, 
+		EVL_END_DATE, 
+		SETLE_WRITER,
+		WRITER_DEPART,
+		LAST_SETLE_EMP)
+		
+		values (
+		#{setleNo}, 
+		#{setleSj}, 
+		#{setleCn}, 
+		SYSDATE, 
+		#{sttusNo} , 
+		#{setleAttach}, 
+		#{setleFormNo}, 
+		#{formInputs}, 
+		#{agrStartDate}, 
+		#{agrEndDate}, 
+		#{evlStartDate}, 
+		#{evlEndDate}, 
+		#{setleWriter},
+		#{writerDepart},
+		#{lastSetleEmp}
+		)
+	</update>
+	
+	<update id="updateSetle" parameterType="setle">
+		update SETLE 
+		set 
+			SETLE_SJ       =  #{setleSj},
+			SETLE_CN       =  #{setleCn},
+			WRITNG_ON      =  SYSDATE,
+			SETLE_ATTACH   =  #{setleAttach},
+			SETLE_FORM_NO  =  #{setleFormNo},
+			FORM_INPUTS    =  #{formInputs},
+			AGR_START_DATE =  #{agrStartDate},
+			AGR_END_DATE   =  #{agrEndDate},
+			EVL_START_DATE =  #{evlStartDate},
+			EVL_END_DATE   =  #{evlEndDate},
+			SETLE_WRITER   =  #{setleWriter},
+			WRITER_DEPART  =  #{writerDepart},
+			LAST_SETLE_EMP =  #{lastSetleEmp}
+		
+		
+		
+		
+		where SETLE_NO=#{setleNo}
+	</update>
+	
+	<update id="updateSetleDel" parameterType="setle">
+		update SETLE 
+		set 
+			DELETLE_ON = #{deletleOn}
+		
+		where SETLE_NO=#{setleNo}
+	</update>
+	
+	<update id="deleteSetle" parameterType="int" >
+		delete 
+		from setle 
+		where SETLE_NO =#{setleNo}		
+	</update>
+		
+	<update id="enabledSetle">
+		update setle
+		set enabled=#{enabled}
+		where id=#{id}
+	</update>
+	
+
+	
+	<update id="updateSetleSttusNo" parameterType="setle">
+		update setle
+		set STTUS_NO=#{sttusNo}
+		where SETLE_NO=#{setleNo}
+	</update>
+</mapper>

@@ -1,0 +1,354 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Mail-Mapper">
+
+
+	<resultMap type="mail" id="MailVO">
+		<result column="EMAIL_NO" property="emailNo" />
+		<result column="SEND_EMP" property="sendEmp" />
+		<result column="EMAIL_SJ" property="emailSj" />
+		<result column="EMAIL_CN" property="emailCn" />
+		<result column="WRITNG_ON" property="writngOn" />
+		<result column="EMAIL_STTUS" property="emailSttus" />
+		<result column="DSPTCH_ON" property="dsptchOn" />
+		<result column="UNITYATCHMNFLNO" property="unityNo" />
+		<result column="SEND_EMP_MAIL" property="sendEmpMail" />
+		<result column="MAIL_SIZE" property="mailSize" />
+		<result column="REMOVE_CODE" property="removeCode" />
+		<result column="TEMPORARY" property="tempor" />
+	</resultMap>
+	
+	<resultMap type="rece" id="ReceVO">
+		<result column="EMAIL_NO" property="emailNo" />
+		<result column="RECE_EMP" property="receEmp" />
+		<result column="RECE_EMAIL" property="receEmail" />
+		<result column="NCNM" property="receNcnm" />
+	</resultMap>
+	
+	<sql id="search">
+		<if test="searchType == 'SJ'.toString()">
+			and A.EMAIL_SJ like '%'||#{keyword}||'%'			
+		</if>
+		
+		<if test="searchType == 'CN'.toString()">
+			and A.EMAIL_CN like '%'||#{keyword}||'%'			
+		</if>
+		
+		<if test="searchType == 'WRI'.toString()">
+			and A.WRITNG like '%'||#{keyword}||'%'			
+		</if>
+	</sql>
+
+	<select id="mailTotal" resultType="int">
+		 SELECT COUNT(*) FROM SEND_EMAIL
+	</select>
+
+	
+	<select id="selectSendMail" resultMap="MailVO" parameterType="hashmap">
+		SELECT A.*, B.NAME AS sendName, B.NCNM FROM SEND_EMAIL A, EMP B
+			WHERE SEND_EMP =  #{empl_no}
+			AND A.REMOVE_CODE = 'N'
+			AND A.TEMPORARY = 0
+			AND A.SEND_EMP = B.EMPL_NO
+			<include refid="search" />
+			ORDER BY A.EMAIL_NO ${nowSort}
+	</select>
+	
+	<select id="selectSendMailCount" resultType="int">
+		SELECT COUNT(*) FROM SEND_EMAIL A, EMP B
+			WHERE SEND_EMP =  #{empl_no}
+			AND A.REMOVE_CODE = 'N'
+			AND A.TEMPORARY = 0
+			AND A.SEND_EMP = B.EMPL_NO
+	</select>
+
+	
+	<select id="selectReceMail" resultMap="MailVO" parameterType="hashmap">
+		SELECT A.EMAIL_NO,
+	       A.SEND_EMP,
+	       A.EMAIL_SJ,
+	       A.WRITNG_ON,
+	       A.DSPTCH_ON,
+	       A.UNITYATCHMNFLNO,
+	       A.SEND_EMP_MAIL,
+	       A.MAIL_SIZE,
+	       A.REMOVE_CODE,
+	       C.NAME AS sendName, C.NCNM, B.EMAIL_STTUS FROM SEND_EMAIL A, RECE_EMAIL B, EMP C
+		        WHERE A.EMAIL_NO = B.EMAIL_NO
+		        AND B.RECE_EMP = #{empl_no}
+		        AND B.REMOVE_CODE = 'N'
+		        AND A.SEND_EMP = C.EMPL_NO
+		        AND A.TEMPORARY = 0
+		        <include refid="search" />
+		        ORDER BY A.EMAIL_NO ${nowSort}
+	</select>
+	
+	
+	<select id="storageMail" resultMap="MailVO" parameterType="hashmap">
+		SELECT A.*, B.NAME AS sendName FROM SEND_EMAIL A, EMP B
+			WHERE SEND_EMP = #{empl_no}
+			AND TEMPORARY = 1
+			AND A.SEND_EMP = B.EMPL_NO
+			AND A.REMOVE_CODE = 'N'
+			<include refid="search" />
+			ORDER BY A.EMAIL_NO ${nowSort}
+	</select>
+	
+	
+	<select id="removeSendMail" resultMap="MailVO">
+		SELECT a.*, b.name as sendName FROM SEND_EMAIL a, emp b
+			WHERE SEND_EMP = #{empl_no}
+			AND REMOVE_CODE = 'Y'
+            and a.send_emp = b.empl_no
+	</select>
+	
+	<select id="removeReceMail" resultMap="MailVO">
+		SELECT A.*, c.name sendName FROM SEND_EMAIL A, RECE_EMAIL B, emp c
+			WHERE A.EMAIL_NO = B.EMAIL_NO
+			AND B.RECE_EMP = #{empl_no}
+			AND B.REMOVE_CODE = 'Y'
+            and a.send_emp = c.empl_no
+	</select>
+	
+	<select id="removeAllMailList" resultMap="MailVO">
+		SELECT A.*, B.id, B.ncnm
+		    FROM SEND_EMAIL A, EMP B
+		    WHERE (EMAIL_NO IN (SELECT EMAIL_NO
+		                        FROM RECE_EMAIL
+		                        WHERE RECE_EMP = #{empl_no}
+		                        AND REMOVE_CODE = 'Y'))
+		    OR (SEND_EMP =#{empl_no}
+		        AND REMOVE_CODE = 'Y')
+		ORDER BY WRITNG_ON DESC
+	</select>
+	
+	<update id="deleteSendMail" parameterType="mail">
+		   UPDATE SEND_EMAIL SET REMOVE_CODE = 'D'
+	       WHERE EMAIL_NO  = #{emailNo}
+	       AND SEND_EMP = #{sendEmp}
+	</update>
+	
+	<update id="deleteReceMail" parameterType="rece">
+		   UPDATE RECE_EMAIL SET REMOVE_CODE = 'D'
+	       WHERE EMAIL_NO  = #{emailNo}
+	       AND RECE_EMP = #{receEmp}
+	</update>
+	
+	<select id="mailAddressList" resultType="emp">
+		SELECT EMPL_NO,
+		       ID,
+		       NAME,
+		       EMAIL,
+		       NCNM
+		FROM EMP  
+	</select>
+	
+	<update id="insertMail" parameterType="mail">
+		INSERT INTO SEND_EMAIL VALUES(
+			    #{emailNo},
+			    #{sendEmp},
+			    #{emailSj},
+			    #{emailCn},
+			    sysdate,
+			    0,
+			    sysdate,
+			   	#{unityNo},
+			    #{sendEmpMail},
+			    #{mailSize},
+			    'N',
+			     #{tempor}
+			)
+	</update>
+	
+	
+	<select id="selectMailSeqNext" resultType="int">
+		SELECT unity_seq.nextval as unityNo FROM dual
+	</select>
+	
+	<select id="selectMailEno" resultType="int">
+		SELECT eno_seq.nextval as emailNo FROM dual
+	</select>
+	
+	
+	<update id="insertReceEmp" parameterType="rece">
+		INSERT INTO RECE_EMAIL VALUES(
+			#{emailNo},
+			#{receEmp},
+			#{receEmail},
+			'N',
+			0,
+			0
+		)
+	</update>
+	
+	<update id="insertRefeEmp" parameterType="refe">
+		INSERT INTO REFE_EMAIL VALUES(
+			#{emailNo},
+			#{refeEmp},
+			#{refeEmail}
+		)
+	</update>
+	
+	
+	<select id="selectMailByEno" parameterType="int" resultMap="MailVO">
+		select a.*, b.name as sendName, b.ncnm, b.id  from send_email a, emp b
+		where email_no = #{emailNo}
+		and a.send_emp = b.EMPL_NO
+	</select>
+	
+	<select id="selectReceEmpList" resultType="rece">
+		select a.email_no as emailNo,
+			   a.rece_emp as receEmp,
+		       b.name as receName,
+		       a.rece_email as receEmail,
+		       b.id,
+		       b.ncnm
+		       from rece_email a, emp b
+		where a.rece_emp = b.EMPL_NO
+	</select>
+	
+	<select id="selectRefeEmpList" resultType="refe">
+		select a.email_no as emailNo,
+		       a.refe_emp as refeEmp,
+		       b.name as refeName,
+		       a.refe_email as refeEmail
+		    from refe_email a, emp b
+		where a.refe_emp = b.EMPL_NO
+	</select>
+	
+	
+	<select id="mailAttachList" resultType="attach">
+		select a.unityatchmnflno,
+		       a.ano,
+		       a.originalname,
+		       a.filename as fileName,
+		       a.uploadpath as uploadPath,
+		       a.filetype as fileType,
+		       a.regdate,
+		       a.filesize
+		from attach a, send_email b
+		where a.unityatchmnflno = b.unityatchmnflno
+	</select>
+	
+	
+	<update id="ReceRemoveCodeChange" parameterType="int">
+		UPDATE RECE_EMAIL SET REMOVE_CODE = 'Y'
+		WHERE EMAIL_NO = #{emailNo}
+	</update>
+	
+	<update id="SendRemoveCodeChange" parameterType="int">
+		UPDATE SEND_EMAIL SET REMOVE_CODE = 'Y'
+		WHERE EMAIL_NO = #{emailNo}
+	</update>
+	
+	<update id="sttusNumUpdate" parameterType="int">
+		UPDATE RECE_EMAIL SET EMAIL_STTUS = 1
+		WHERE EMAIL_NO = #{emailNo}
+	</update>
+	
+	
+	<update id="storageSendMail" parameterType="int">
+		UPDATE SEND_EMAIL SET TEMPORARY = 0
+    	WHERE EMAIL_NO = #{emailNo}
+	</update>
+	
+	
+	<update id="returnReceMail" parameterType="int">
+		UPDATE RECE_EMAIL SET remove_code = 'N'
+    	WHERE EMAIL_NO = #{emailNo}
+	</update>
+	
+	
+	<update id="returnSendMail" parameterType="int">
+		UPDATE SEND_EMAIL SET remove_code = 'N'
+    	WHERE EMAIL_NO = #{emailNo}
+	</update>
+	
+	<select id="dashboardAll" parameterType="hashmap" resultMap="MailVO">
+		select *
+		    from SEND_EMAIL
+		    where (EMAIL_NO in (select EMAIL_NO
+		                        from RECE_EMAIL
+		                        where RECE_EMP = #{empl_no}
+		                        and REMOVE_CODE = 'N'))
+		    OR (SEND_EMP = #{empl_no}
+		        AND REMOVE_CODE = 'N')
+		ORDER BY WRITNG_ON DESC
+	</select>
+	
+	<select id="dashboardTrash" parameterType="hashmap" resultMap="MailVO">
+		select *
+		    from SEND_EMAIL
+		    where (EMAIL_NO in (select EMAIL_NO
+		                        from RECE_EMAIL
+		                        where RECE_EMP = #{empl_no}
+		                        and REMOVE_CODE = 'Y'))
+		    OR (SEND_EMP = #{empl_no}
+		        AND REMOVE_CODE = 'Y')
+		ORDER BY WRITNG_ON DESC
+	</select>
+
+	<select id="selectMailListCount" parameterType="str" resultType="hashmap">
+		
+		select (
+			select count(*)
+		    from SEND_EMAIL
+		    where (EMAIL_NO in (select EMAIL_NO
+		                        from RECE_EMAIL
+		                        where RECE_EMP = #{empl_no}
+		                        and REMOVE_CODE = 'N'))
+		    OR (SEND_EMP = #{empl_no}
+		        AND REMOVE_CODE = 'N')
+		
+		) as all_count
+		,
+		(
+			select count(*)
+		    from SEND_EMAIL
+		    where (EMAIL_NO in (select EMAIL_NO
+		                        from RECE_EMAIL
+		                        where RECE_EMP = #{empl_no}
+		                        and REMOVE_CODE = 'Y'))
+		    OR (SEND_EMP = #{empl_no}
+		        AND REMOVE_CODE = 'Y')
+		
+		) as trash_count,
+		(select count(*)
+		    from SEND_EMAIL
+		    where (EMAIL_NO in (select EMAIL_NO
+		                        from RECE_EMAIL
+		                        where RECE_EMP = #{empl_no}
+		                        and REMOVE_CODE = 'N')))
+		  as recv_count, 
+		  (select count(*)
+		    from SEND_EMAIL
+		    where SEND_EMP = #{empl_no}
+		        AND REMOVE_CODE = 'N') as send_count , 
+		  (select count(*)
+		    from SEND_EMAIL
+		    where SEND_EMP = #{empl_no}
+		        AND REMOVE_CODE = 'N'
+		        AND TEMPORARY = 1) as save_count
+		from dual
+		
+	</select>
+	
+	
+	<select id="recentlyList" parameterType="str" resultMap="ReceVO">
+	   	SELECT DISTINCT A.RECE_EMP, A.RECE_EMAIL , B.NCNM
+	    FROM RECE_EMAIL A, EMP B
+	    WHERE A.RECE_EMP = B.EMPL_NO 
+	    AND A.EMAIL_NO IN 
+	    (SELECT EMAIL_NO   
+	    FROM SEND_EMAIL 
+	    WHERE SEND_EMP = #{empl_no}
+		 	<![CDATA[AND SYSDATE - WRITNG_ON < 30)]]>
+	</select>
+	
+
+		
+	</mapper>

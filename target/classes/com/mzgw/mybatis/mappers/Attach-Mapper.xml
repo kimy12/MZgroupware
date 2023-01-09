@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Attach-Mapper">
+
+	<sql id="search">	
+		<if test="searchType == 's'.toString()">
+			and (ORIGINALNAME like '%'||#{keyword}||'%')
+		</if>
+	</sql>
+	
+	<update id="insertAttach" parameterType="attach">
+		INSERT INTO ATTACH 
+		(UNITYATCHMNFLNO,
+		 ANO,
+		 ORIGINALNAME,
+		 FILENAME,
+		 UPLOADPATH,
+		 FILETYPE,
+		 REGDATE,
+		 FILESIZE
+		)
+		VALUES(
+		    #{unityatchmnflno},
+		    #{ano},
+		    #{originalname},
+		    #{fileName},
+		    #{uploadPath},
+		    #{fileType},
+		    SYSDATE,
+		    #{filesize}
+		)
+	</update>
+	
+	<select id="selectUnitySeq" resultType="int">
+		
+		SELECT unity_seq.nextval as unityNo FROM dual
+	
+	</select>
+	
+	<select id="selectAnoSeq" resultType="int">
+		
+		SELECT ano_seq.nextval as unityNo FROM dual
+	
+	</select>
+	
+	<select id="selectAttachByUnityatchmnflno" parameterType="hashmap" resultType="attach">
+		select *
+		from attach
+		where unityatchmnflno = #{m_unityatchmnflno}
+		and del = 'N'
+		<include refid="search" />
+		order by REGDATE ${nowSort} 
+	</select>
+	
+	
+	<select id="selectAttachByUnityatchmnflnoCount" parameterType="hashmap"  resultType="int">
+		select count(*)
+		from attach
+		where unityatchmnflno = #{m_unityatchmnflno}
+		and del = 'N'
+		<include refid="search" />
+		order by REGDATE ${nowSort} 
+	</select>
+	
+	<select id="selectDeletedAttachByM" parameterType="hashmap" resultType="attach">
+		select *
+		from attach
+		where unityatchmnflno in (select m_unityatchmnflno 
+                                    from PDS_PRIVATE
+                                    where m_writer = #{ncnm})
+		and del = 'Y'
+		<include refid="search" />
+		order by REGDATE ${nowSort} 
+	</select>
+	
+	<select id="selectDeletedAttachByMCount" parameterType="hashmap" resultType="int">
+		select count(*)
+		from attach
+		where unityatchmnflno in (select m_unityatchmnflno 
+                                    from PDS_PRIVATE
+                                    where m_writer = #{ncnm})
+		and del = 'Y'
+		<include refid="search" />
+		order by REGDATE ${nowSort} 
+	</select>
+	
+	<select id="selectAttachByDUnityatchmnflno" parameterType="hashmap" resultType="attach">
+		select *
+		from attach
+		where unityatchmnflno = #{d_unityatchmnflno}
+		and del = 'N'
+		<include refid="search" />
+		order by REGDATE ${nowSort} 
+	</select>
+	
+	<select id="selectAttachByDUnityatchmnflnoCount" parameterType="hashmap"  resultType="int">
+		select count(*)
+		from attach
+		where unityatchmnflno = #{d_unityatchmnflno}
+		and del = 'N'
+		<include refid="search" />
+		order by REGDATE ${nowSort} 
+	</select>
+	
+	<select id="selectAttachByEUnityatchmnflno" parameterType="hashmap" resultType="attach">
+		select *
+		from attach
+		where unityatchmnflno = #{e_unityatchmnflno}
+		and del = 'N'
+		<include refid="search" />
+		order by REGDATE ${nowSort} 
+	</select>
+	
+	<select id="selectAttachByEUnityatchmnflnoCount" parameterType="hashmap"  resultType="int">
+		select count(*)
+		from attach
+		where unityatchmnflno = #{e_unityatchmnflno}
+		and del = 'N'
+		<include refid="search" />
+		order by REGDATE ${nowSort} 
+	</select>
+	
+
+	<select id="selectAttachPds" parameterType="attach" resultType="attach">
+		SELECT *
+		FROM ATTACH
+		WHERE UNITYATCHMNFLNO = #{unityatchmnflno}
+		  AND ANO = #{ano}
+	</select>
+	
+	<select id="selectAttachWork" parameterType="attach" resultType="attach">
+		SELECT *
+		FROM ATTACH
+		WHERE UNITYATCHMNFLNO = #{unityatchmnflno}
+		  AND ANO = #{ano}
+	</select>
+	
+	
+	<select id="selectAttachMail" parameterType="attach" resultType="attach">
+		SELECT *
+		FROM ATTACH
+		WHERE UNITYATCHMNFLNO = #{unityatchmnflno}
+		  AND ANO = #{ano}
+	</select>
+	<!-- <select id="selectAttachByAno" parameterType="attach" resultType="attach">
+		SELECT *
+		FROM ATTACH
+		WHERE ano = #{ano}
+	</select> -->
+	
+	<update id="updateDel" parameterType="attach">
+		update 
+		attach 
+		set 
+		del= 'Y'
+		where unityatchmnflno = #{unityatchmnflno}
+		and ano = #{ano}
+	</update>
+	
+	<update id="recoverDel" parameterType="attach">
+		update 
+		attach 
+		set 
+		del= 'N'
+		where ano = #{ano}
+	</update>
+	
+	<select id="selectAttachByUni" resultType="attach">
+		SELECT *
+		FROM ATTACH
+		WHERE unityatchmnflno = #{unityatchmnflno}
+	</select>
+	
+	<select id="selectAttachByUniToSetle" resultType="attach">
+		SELECT *
+		FROM ATTACH
+		WHERE unityatchmnflno = #{unityatchmnflno}
+	</select>
+	
+	<select id="deleteAttach">
+		DELETE FROM ATTACH 
+			WHERE unityatchmnflno = #{unityatchmnflno}
+	</select>
+	
+	<select id="deleteAttachByAno">
+		 DELETE FROM ATTACH 
+			WHERE ano = #{ano}
+	</select>
+	
+	<select id="deleteAttachByAnoAndUni" parameterType="hashmap">
+		 DELETE FROM ATTACH 
+			WHERE ano = #{ano}
+			and unityatchmnflno  = #{unityatchmnflno}
+	</select>
+	
+	<select id="deleteAttachNotice" parameterType="attach">
+		 DELETE FROM ATTACH 
+			WHERE ano = #{ano}
+			and unityatchmnflno  = #{unityatchmnflno}
+	</select>
+	
+	<select id="isFileCount" parameterType="int" resultType="int">
+		select count(ano)
+		from attach
+		where unityatchmnflno = #{unityatchmnflno}
+		and del = 'N'
+	</select>
+	
+	
+	<select id="selectAttachFromBoard" resultType="attach">
+		SELECT *
+		FROM ATTACH
+		WHERE unityatchmnflno = #{unityatchmnflno}
+	</select>
+	
+	<select id="selectGalleryListImage" parameterType="attach" resultType="attach">
+	select * 
+	from ATTACH 
+	where UNITYATCHMNFLNO = #{unityatchmnflno}
+	and ANO = 1
+	</select>
+	
+	<select id="selectGalleryImagesForDetail" parameterType="attach" resultType="attach">
+	select * 
+	from ATTACH 
+	where UNITYATCHMNFLNO = #{unityatchmnflno}
+	</select>
+	
+
+</mapper>  
+
+

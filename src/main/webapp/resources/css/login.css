@@ -1,0 +1,165 @@
+html, body{
+  width:100%;
+  height:100%;
+  margin:0;
+}
+
+.wrapper {
+  width:100%;
+  height:100%;
+  perspective: 600px;
+  position:relative;
+  background: linear-gradient( to right, #3B554A, #A0C4A0);
+}
+
+.face {
+ 	position: absolute;
+    width: 300px;
+    padding: 60px 40px;
+    background: rgba(250, 250, 250, 0.3);
+    border: 0.5px solid #fff;
+    border-radius: 3px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  
+}
+
+.face .login_content {
+  color: #fff;
+  text-align: center;
+  
+}
+
+.face .login_content h2 {
+  font-size: 40px;
+  color: #fff;
+}
+
+.face .login_content .field-wrapper {
+  margin-top: 30px;
+  position: relative;
+}
+
+.face .login_content .field-wrapper label {
+  position: absolute;
+  pointer-events: none;
+  font-size:15px;
+  top: 40%;
+  left: 0;
+  transform: translateY(-50%);
+  transition: all ease-in 0.25s;
+  color: #fff;
+}
+
+.face .login_content .field-wrapper input[type="text"], .face .login_content .field-wrapper input[type="password"], .face .login_content .field-wrapper input[type="submit"], .face .login_content .field-wrapper textarea {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.face .login_content .field-wrapper input[type="text"]:focus, .face .login_content .field-wrapper input[type="password"]:focus, .face .login_content .field-wrapper input[type="submit"]:focus, .face .login_content .field-wrapper textarea:focus {
+  outline: none;
+}
+
+.face .login_content .field-wrapper input[type="text"], .face .login_content .field-wrapper input[type="password"], .face .login_content .field-wrapper textarea {
+  width: 100%;
+  border: none;
+  background: transparent;
+  line-height: 2em;
+  border-bottom: 1px solid #fff;
+  color: #fff;
+}
+
+.face .login_content .field-wrapper input[type="text"]:focus{
+	background:none;	
+}
+
+.face .login_content .field-wrapper input[type="text"]::-webkit-input-placeholder, .face .login_content .field-wrapper input[type="password"]::-webkit-input-placeholder, .face .login_content .field-wrapper textarea::-webkit-input-placeholder {
+  opacity: 0;
+}
+
+.face .login_content .field-wrapper input[type="text"]::-moz-placeholder, .face .login_content .field-wrapper input[type="password"]::-moz-placeholder, .face .login_content .field-wrapper textarea::-moz-placeholder {
+  opacity: 0;
+}
+
+.face .login_content .field-wrapper input[type="text"]:-ms-input-placeholder, .face .login_content .field-wrapper input[type="password"]:-ms-input-placeholder, .face .login_content .field-wrapper textarea:-ms-input-placeholder {
+  opacity: 0;
+}
+
+.face .login_content .field-wrapper input[type="text"]:-moz-placeholder, .face .login_content .field-wrapper input[type="password"]:-moz-placeholder, .face .login_content .field-wrapper textarea:-moz-placeholder {
+  opacity: 0;
+}
+
+.face .login_content .field-wrapper input[type="text"]:focus + label, .face .login_content .field-wrapper input[type="text"]:not(:placeholder-shown) + label, .face .login_content .field-wrapper input[type="password"]:focus + label, .face .login_content .field-wrapper input[type="password"]:not(:placeholder-shown) + label, .face .login_content .field-wrapper textarea:focus + label, .face .login_content .field-wrapper textarea:not(:placeholder-shown) + label {
+  top: -35%;
+  color: #fff;
+} 
+
+.face .login_content .field-wrapper input[type="submit"] {
+  -webkit-appearance: none;
+  appearance: none;
+  cursor: pointer;
+  width:100%;
+  background: #2B363C;
+  line-height: 2em;
+  color: #fff;
+  border-radius: 3px;
+  padding: 5px;
+  border:0;
+  margin-bottom:10px
+}
+
+.face .login_content .field-wrapper input[type="submit"]:hover {
+  opacity: 0.9;
+}
+
+.face .login_content .field-wrapper input[type="submit"]:active {
+  transform: scale(0.96);
+}
+
+.face .login_content .field-wrapper textarea {
+  resize: none;
+  line-height: 1em;
+}
+
+.face .login_content .field-wrapper textarea:focus + label, .face .login_content .field-wrapper textarea:not(:placeholder-shown) + label {
+  top: -25%;
+}
+
+.psw {
+  display: block;
+  margin: 20px 0;
+  font-size: 0.75em;
+  text-align: center;
+  color: #fff;
+  cursor: pointer;
+}
+
+.login-btn{
+	display: flex;
+    justify-content: space-between;
+    align-items: center;
+	
+}
+
+.login-btn button{
+	background:none;
+	border:0;
+	color:#fff;
+	font-size: 0.75em;
+	font-weight: 500;
+	cursor:pointer;
+}
+
+.login-btn i{
+	margin-right:10px
+}
+
+input:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 1000px transparent inset;
+  -webkit-text-fill-color:#fff;
+}
+
+input:-webkit-autofill, input:-webkit-autofill:hover, input:-webkit-autofill:focus, input:-webkit-autofill:active {
+  transition: background-color 5000s ease-in-out 0s;
+}

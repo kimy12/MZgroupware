@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+ <mapper namespace="Popup-Mapper">
+ 
+ 	<select id="selectPopup" resultType="board">
+ 	
+		SELECT
+			a.p_no,
+			a.start_date,
+			a.end_date,
+			a.b_no,
+			b.board_title,
+			b.board_cont
+		FROM
+			popup a, board b
+		WHERE
+			a.b_no = b.board_no
+			AND start_date &lt;= to_char(sysdate, 'yyyymmdd') 
+			AND end_date &gt;= to_char(sysdate, 'yyyymmdd')	
+ 	</select>
+ 	
+ 	<select id="popupTotalCount" resultType="int">
+ 		SELECT COUNT(*) 
+ 		  FROM POPUP
+ 	</select>
+ 	
+ 	<insert id="insertPopup" parameterType="board">
+ 		INSERT INTO
+ 		POPUP
+		(
+ 			p_no,
+ 			start_date,
+ 			end_date,
+ 			b_no
+		)
+ 		VALUES
+		(
+			popup_seq.nextval,
+			#{start_date},
+			#{end_date},
+			#{board_no}
+		) 
+ 	</insert>
+ 	
+ 	<select id="popupCount" parameterType="board" resultType="int">
+ 		SELECT COUNT(*) 
+ 		  FROM POPUP 
+ 		 WHERE B_NO = #{board_no}
+ 	</select>
+ 	
+ 	<update id="updatePopup" parameterType="board">
+ 		UPDATE POPUP
+		   SET START_DATE = TO_DATE(#{start_date}, 'YYYY/MM/DD'),
+		       END_DATE = TO_DATE(#{end_date}, 'YYYY/MM/DD')   
+		 WHERE B_NO=#{board_no}
+ 	</update>
+ 	
+ 	<update id="deletePopup" parameterType="board">
+ 		DELETE 
+ 		  FROM POPUP
+ 		 WHERE B_NO=#{board_no}
+ 	</update>
+ 
+ 
+ </mapper>

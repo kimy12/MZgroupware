@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+  <mapper namespace="Dclz-Mapper">
+  
+	<select id="selectDclzList" resultType="dclz">
+		SELECT 
+		*
+		FROM
+		DCLZ
+		ORDER BY DCLZSN DESC
+	</select>
+	
+	<select id="selectWeekTotalTime" resultType="dclz" parameterType="dclz">
+		SELECT CASE WHEN SUM(WORKTIME) IS NULL THEN 0
+		       ELSE SUM(WORKTIME) 
+		       END AS TOTALWORKTIME,
+			   <![CDATA[CASE WHEN SUM(WORKTIME)-144000 < 0 THEN 0]]>
+          	   WHEN SUM(WORKTIME)-144000 IS NULL THEN 0
+          	   ELSE SUM(WORKTIME)-144000
+       	   END AS EXCESSTIME     
+       	  FROM DCLZ
+		 WHERE EMPL_NO = #{empl_no} 
+		   AND WORKON
+	   BETWEEN #{weekStartDate} AND #{weekEndDate}
+	</select>
+	
+	<select id="selectEmpExcelWorkTime" resultType="dclz" parameterType="dclz">
+		SELECT TO_CHAR(WORKON,'YYYY/MM/DD') AS WORKON,
+		       BEGINTIME,
+		       ENDTIME,
+		       TO_CHAR(TO_DATE(WORKTIME,'SSSSS'), 'HH24:MI') AS WORKTIME
+		  FROM DCLZ 
+		 WHERE EMPL_NO = #{empl_no} 
+		   AND WORKON BETWEEN #{weekStartDate} AND #{weekEndDate}
+		 ORDER BY DCLZSN ASC
+	</select>
+	
+	<select id="selectWeekWorkTime" resultType="dclz" parameterType="dclz">
+		SELECT * 
+		  FROM DCLZ 
+		 WHERE EMPL_NO = #{empl_no} 
+		   AND WORKON BETWEEN #{weekStartDate} AND #{weekEndDate}
+		 ORDER BY DCLZSN ASC
+	</select>
+	
+	<select id="selectWorkTime" parameterType="str" resultType="dclz">
+		SELECT * 
+		  FROM DCLZ 
+		 WHERE TO_CHAR(WORKON,'YYYY/MM/DD') = TO_CHAR(SYSDATE,'YYYY/MM/DD') 
+		   AND EMPL_NO = #{empl_no}
+	</select>
+	
+	<select id="selectThisMonthTime" parameterType="dclz" resultType="str">
+		SELECT SUM(WORKTIME) 
+		  FROM DCLZ 
+		 WHERE EMPL_NO = #{empl_no} 
+		   AND WORKON BETWEEN #{weekStartDate} AND #{weekEndDate}
+	</select>
+	
+	<select id="selectDclzMediation" parameterType="emp" resultType="dclzMed">
+		SELECT *
+		  FROM DCLZMEDITATION
+		 WHERE EMPL_NO = #{empl_no}
+	</select>
+		
+	<update id="startWorktime" parameterType="dclz">
+		INSERT INTO DCLZ(DCLZSN, EMPL_NO, WORKON, BEGINTIME, WORKSTLECODE)
+		VALUES(DCLZ_SEQ.NEXTVAL,#{empl_no},SYSDATE,#{beginTime},#{workstleCode})
+	</update>
+	
+	<update id="updateWorkEndTime" parameterType="dclz">
+		UPDATE DCLZ
+		   SET ENDTIME = #{endTime},
+		       WORKTIME = #{workTime},
+		       WORKSTLECODE = #{workstleCode}
+		 WHERE EMPL_NO = #{empl_no}
+		   AND TO_CHAR(WORKON,'YYYY/MM/DD') = TO_CHAR(SYSDATE,'YYYY/MM/DD') 
+	</update>
+
+  	<update id="insertDclzMediation" parameterType="dclzMed">
+  		INSERT INTO DCLZMEDITATION(
+	  		MEDNO,
+			DCLZSN,
+			MEDREASON,
+			PROGRESSCODE,
+			REQUESTDATE,
+			PREVDATE,
+			PREVBEGINTIME,
+			PREVENDTIME,
+			REQBEGINTIME,
+			REQENDTIME,
+			EMPL_NO
+		)
+		VALUES(
+			DCLZMED_SEQ.NEXTVAL,
+			#{dclzsn},
+			#{medreason},
+			#{progresscode},
+			SYSDATE,
+			#{prevdate},
+			#{prevbegintime},
+			#{prevendtime},
+			#{reqbegintime},
+			#{reqendtime},
+			#{empl_no}
+		)
+  	</update>
+  	
+<!-- Annual -->
+	<select id="selectAnnualList" parameterType="hashmap" resultType="annual">
+		SELECT A.*,
+		       B.NAME,
+		       B.DEPT
+		  FROM ANNUAL A, EMP B
+		  WHERE A.EMPL_NO = B.EMPL_NO
+		    AND A.STARTDATE BETWEEN REPLACE(#{start},'/','-') AND REPLACE(#{end},'/','-')
+		    AND A.EMPL_NO = #{empl_no}
+		  ORDER BY STARTDATE ASC
+	</select>
+	
+	<select id="selectAnnualListCount" parameterType="hashmap" resultType="int">
+		SELECT COUNT(*) 
+		  FROM ANNUAL 
+		 WHERE EMPL_NO = #{empl_no}
+	</select>
+	
+	<select id="selectAnnualTotalUse" parameterType="emp" resultType="int">
+		SELECT CASE WHEN SUM(USE) IS NULL THEN 0
+		       ELSE SUM(USE)
+		       END AS TOTALUSE
+		  FROM ANNUAL
+		 WHERE KIND = 'y'
+		   AND EMPL_NO = #{empl_no}
+	</select>
+  
+  
+  </mapper>
+  
+  

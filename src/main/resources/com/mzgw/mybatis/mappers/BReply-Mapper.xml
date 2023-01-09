@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+  <mapper namespace="BReply-Mapper">
+  
+  		<select id="selectBReplyList" resultType="breply">
+  		
+  			select a.*,
+			b.name writer,
+			b.id
+			from breply a, emp b
+			where a.empl_no = b.EMPL_NO
+			and a.board_no = #{value}
+			order by breply_regdate desc
+  		
+  		</select>
+  		
+  		<update id="insertBReply" parameterType="breply">
+  		
+  			insert 
+  			into 
+  			breply (breply_no,
+		  		   board_no,
+		  		   empl_no,
+		  		   breply_cont
+		  		   )
+  			
+  			values (breply_seq.nextval,
+  				    #{board_no},
+  				    #{empl_no},
+  				    #{breply_cont}
+  				    )
+  				
+  		</update>
+  		
+  		<update id="updateBReply" parameterType="breply">
+  		
+  			update breply
+  			set
+  			breply_cont=#{breply_cont},
+  			breply_mofdate=sysdate
+  			where breply_no = #{breply_no}
+  			
+  		</update>
+  		
+  		<delete id="deleteBReply" parameterType="int">
+  		
+  			delete
+  			from breply
+  			where breply_no =#{breply_no}
+  		
+  		</delete>
+  		
+  	
+  		
+  
+  
+  
+  </mapper>
+  
